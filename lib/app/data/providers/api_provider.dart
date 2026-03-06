@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
-import '../models/user_model.dart';
+import 'package:test_maret/app/data/models/user_model.dart';
 
 class ApiProvider {
   final String baseUrl = "http://YOURDOMAIN/api";

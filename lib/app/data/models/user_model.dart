@@ -3,6 +3,7 @@ class UserModel {
   String? nama;
   String? email;
   String? hp;
+  String? nik;
   int? levelId;
   int? statusAktif;
 
@@ -11,6 +12,7 @@ class UserModel {
     this.nama,
     this.email,
     this.hp,
+    this.nik,
     this.levelId,
     this.statusAktif,
   });
@@ -20,6 +22,7 @@ class UserModel {
     nama = json['nama'];
     email = json['email'];
     hp = json['hp'];
+    nik = json['nik'];
     levelId = json['levelId'] ?? json['level_id'];
     statusAktif = json['statusAktif'] ?? json['status_aktif'];
   }
@@ -30,6 +33,7 @@ class UserModel {
     data['nama'] = nama;
     data['email'] = email;
     data['hp'] = hp;
+    data['nik'] = nik;
     data['levelId'] = levelId;
     data['statusAktif'] = statusAktif;
     return data;

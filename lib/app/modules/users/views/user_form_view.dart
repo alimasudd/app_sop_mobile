@@ -11,6 +11,7 @@ class UserFormView extends GetView<UsersController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: Text(user == null ? 'Tambah User' : 'Edit User'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -45,19 +46,24 @@ class UserFormView extends GetView<UsersController> {
                     icon: Icons.phone_android_outlined,
                   ),
                   const SizedBox(height: 20),
-                  _buildDropdown(
+                  _buildDropdown<int>(
                     label: 'Level',
-                    value: controller.selectedLevelId.value,
+                    value: [1, 2, 5].contains(controller.selectedLevelId.value) 
+                        ? controller.selectedLevelId.value 
+                        : 2, // Default to 2 if current value is unknown
                     items: const [
                       DropdownMenuItem(value: 1, child: Text('Admin')),
                       DropdownMenuItem(value: 2, child: Text('User')),
+                      DropdownMenuItem(value: 5, child: Text('Staff')),
                     ],
                     onChanged: (val) => controller.selectedLevelId.value = val!,
                   ),
                   const SizedBox(height: 15),
-                  _buildDropdown(
+                  _buildDropdown<int>(
                     label: 'Status',
-                    value: controller.selectedStatusAktif.value,
+                    value: [0, 1].contains(controller.selectedStatusAktif.value)
+                        ? controller.selectedStatusAktif.value
+                        : 1, // Default to 1 (Active)
                     items: const [
                       DropdownMenuItem(value: 1, child: Text('Aktif')),
                       DropdownMenuItem(value: 0, child: Text('Nonaktif')),

@@ -19,6 +19,7 @@ class HomeView extends GetView<HomeController> {
     return Scaffold(
       drawer: _buildSidebar(),
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: Obx(() => Text(_getTitle(controller.selectedIndex.value))),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

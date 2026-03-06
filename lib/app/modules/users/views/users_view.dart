@@ -47,6 +47,7 @@ class UsersView extends GetView<UsersController> {
 
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: const Text('Manajemen User'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

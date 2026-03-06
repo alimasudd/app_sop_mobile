@@ -1,23 +1,27 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:test_maret/app/routes/app_pages.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
+  var selectedIndex = 0.obs;
+  final storage = GetStorage();
 
-  final count = 0.obs;
-  @override
-  void onInit() {
-    super.onInit();
+  void changeIndex(int index) {
+    selectedIndex.value = index;
   }
 
-  @override
-  void onReady() {
-    super.onReady();
+  void logout() {
+    Get.defaultDialog(
+      title: 'Logout',
+      middleText: 'Are you sure you want to logout?',
+      textConfirm: 'Yes',
+      textCancel: 'No',
+      confirmTextColor: Colors.white,
+      onConfirm: () {
+        storage.remove('token');
+        Get.offAllNamed(Routes.LOGIN);
+      },
+    );
   }
-
-  @override
-  void onClose() {
-    super.onClose();
-  }
-
-  void increment() => count.value++;
 }

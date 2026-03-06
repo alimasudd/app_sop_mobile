@@ -9,6 +9,42 @@ class UsersView extends GetView<UsersController> {
 
   @override
   Widget build(BuildContext context) {
+    bool isEmbedded = Get.routing.current == '/home' || Get.routing.current == '/';
+    
+    Widget content = Column(
+      children: [
+        _buildSearchBar(),
+        Expanded(
+          child: Obx(() {
+            if (controller.isLoading.value && controller.users.isEmpty) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (controller.filteredUsers.isEmpty) {
+              return const Center(child: Text("No users found"));
+            }
+            return RefreshIndicator(
+              onRefresh: () async => controller.fetchUsers(),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(10),
+                itemCount: controller.filteredUsers.length,
+                itemBuilder: (context, index) {
+                  final user = controller.filteredUsers[index];
+                  return _buildUserCard(user);
+                },
+              ),
+            );
+          }),
+        ),
+      ],
+    );
+
+    if (isEmbedded) {
+      return Scaffold(
+        body: content,
+        floatingActionButton: _buildFAB(),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('User Management'),
@@ -20,40 +56,19 @@ class UsersView extends GetView<UsersController> {
           ),
         ),
       ),
-      body: Column(
-        children: [
-          _buildSearchBar(),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value && controller.users.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (controller.filteredUsers.isEmpty) {
-                return const Center(child: Text("No users found"));
-              }
-              return RefreshIndicator(
-                onRefresh: () async => controller.fetchUsers(),
-                child: ListView.builder(
-                  padding: const EdgeInsets.all(10),
-                  itemCount: controller.filteredUsers.length,
-                  itemBuilder: (context, index) {
-                    final user = controller.filteredUsers[index];
-                    return _buildUserCard(user);
-                  },
-                ),
-              );
-            }),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          controller.setupForm();
-          Get.to(() => const UserFormView());
-        },
-        backgroundColor: const Color(0xFF6A11CB),
-        child: const Icon(Icons.add, color: Colors.white),
-      ),
+      body: content,
+      floatingActionButton: _buildFAB(),
+    );
+  }
+
+  Widget _buildFAB() {
+    return FloatingActionButton(
+      onPressed: () {
+        controller.setupForm();
+        Get.to(() => const UserFormView());
+      },
+      backgroundColor: const Color(0xFF6A11CB),
+      child: const Icon(Icons.add, color: Colors.white),
     );
   }
 

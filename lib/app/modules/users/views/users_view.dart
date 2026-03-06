@@ -20,7 +20,7 @@ class UsersView extends GetView<UsersController> {
               return const Center(child: CircularProgressIndicator());
             }
             if (controller.filteredUsers.isEmpty) {
-              return const Center(child: Text("No users found"));
+              return const Center(child: Text("Data user tidak ditemukan"));
             }
             return RefreshIndicator(
               onRefresh: () async => controller.fetchUsers(),
@@ -47,7 +47,7 @@ class UsersView extends GetView<UsersController> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('User Management'),
+        title: const Text('Manajemen User'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -79,7 +79,7 @@ class UsersView extends GetView<UsersController> {
         controller: controller.searchController,
         onChanged: controller.searchUser,
         decoration: InputDecoration(
-          hintText: 'Search by name or email...',
+          hintText: 'Cari berdasarkan nama atau email...',
           prefixIcon: const Icon(Icons.search),
           filled: true,
           fillColor: Colors.grey[200],

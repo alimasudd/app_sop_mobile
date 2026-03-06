@@ -8,141 +8,159 @@ class RegisterView extends GetView<AuthController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF6A11CB),
-              Color(0xFF2575FC),
-            ],
-          ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: const Text('Daftar Akun Baru', style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.blueAccent),
+          onPressed: () => Get.back(),
         ),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(30),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.person_add_outlined,
-                    size: 80,
-                    color: Colors.white,
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    'Create Account',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Join us today!',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  _buildTextField(
-                    controller: controller.regNamaController,
-                    hintText: 'Full Name',
-                    icon: Icons.person_outline,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: controller.regEmailController,
-                    hintText: 'Email',
-                    icon: Icons.email_outlined,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: controller.regPasswordController,
-                    hintText: 'Password',
-                    icon: Icons.lock_outline,
-                    isPassword: true,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: controller.regHpController,
-                    hintText: 'Phone Number',
-                    icon: Icons.phone_android_outlined,
-                  ),
-                  const SizedBox(height: 30),
-                  Obx(() {
-                    return SizedBox(
-                      width: double.infinity,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: controller.isLoading.value
-                            ? null
-                            : () => controller.register(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF2575FC),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
-                          ),
-                          elevation: 5,
-                        ),
-                        child: controller.isLoading.value
-                            ? const CircularProgressIndicator(
-                                color: Color(0xFF2575FC),
-                              )
-                            : const Text(
-                                'REGISTER',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
-                    );
-                  }),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: () => Get.back(),
-                    child: const Text(
-                      "Already have an account? Login",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Lengkapi Data Diri',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF242B42)),
               ),
-            ),
+              const SizedBox(height: 10),
+              const Text(
+                'Pastikan data yang diisi benar sesuai KTP.',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 40),
+              
+              // NIK
+              _buildModernTextField(
+                controller: controller.regNikController,
+                hintText: 'NIK',
+                keyboardType: TextInputType.number,
+                maxLength: 16,
+              ),
+              const Divider(height: 1, color: Colors.grey),
+              
+              // Nama Lengkap
+              _buildModernTextField(
+                controller: controller.regNamaController,
+                hintText: 'Nama Lengkap',
+              ),
+              const Divider(height: 1, color: Colors.grey),
+              
+              // Nomor HP
+              _buildModernTextField(
+                controller: controller.regHpController,
+                hintText: 'Nomor HP / WhatsApp',
+                keyboardType: TextInputType.phone,
+              ),
+              const Divider(height: 1, color: Colors.grey),
+              
+              // Email (Standard blue-ish box style from image)
+              const SizedBox(height: 10),
+              _buildBoxedTextField(
+                controller: controller.regEmailController,
+                hintText: 'harisk@gmail.com',
+                prefixIcon: Icons.email_outlined,
+              ),
+              const SizedBox(height: 15),
+              
+              // Password
+              _buildBoxedTextField(
+                controller: controller.regPasswordController,
+                hintText: '*********',
+                isPassword: true,
+                prefixIcon: Icons.lock_outline,
+              ),
+              const SizedBox(height: 40),
+              
+              // Register Button
+              Obx(() => SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: controller.isLoading.value ? null : () => controller.register(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF2D5BD0),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: controller.isLoading.value
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text(
+                          'DAFTAR SEKARANG',
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                ),
+              )),
+              
+              const SizedBox(height: 20),
+              Center(
+                child: TextButton(
+                  onPressed: () => Get.back(),
+                  child: const Text(
+                   'Sudah punya akun? Masuk',
+                   style: TextStyle(color: Color(0xFF2D5BD0)),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
+  // Linear field style for top fields
+  Widget _buildModernTextField({
     required TextEditingController controller,
     required String hintText,
-    required IconData icon,
+    TextInputType keyboardType = TextInputType.text,
+    int? maxLength,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        maxLength: maxLength,
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+          counterText: "",
+        ),
+      ),
+    );
+  }
+
+  // Boxed style for email/password fields
+  Widget _buildBoxedTextField({
+    required TextEditingController controller,
+    required String hintText,
     bool isPassword = false,
+    IconData? prefixIcon,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(15),
+        color: const Color(0xFFE9F0FF),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.blueAccent.withOpacity(0.1)),
       ),
       child: TextField(
         controller: controller,
         obscureText: isPassword,
-        style: const TextStyle(color: Colors.white),
         decoration: InputDecoration(
-          prefixIcon: Icon(icon, color: Colors.white70),
           hintText: hintText,
-          hintStyle: const TextStyle(color: Colors.white70),
+          prefixIcon: Icon(prefixIcon, color: Colors.blueAccent.withOpacity(0.5)),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 18),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
         ),
       ),
     );

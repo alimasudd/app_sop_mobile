@@ -11,7 +11,7 @@ class UserFormView extends GetView<UsersController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(user == null ? 'Create User' : 'Edit User'),
+        title: Text(user == null ? 'Tambah User' : 'Edit User'),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -29,19 +29,19 @@ class UserFormView extends GetView<UsersController> {
                 children: [
                   _buildTextField(
                     controller: controller.namaController,
-                    label: 'Full Name',
+                    label: 'Nama Lengkap',
                     icon: Icons.person_outline,
                   ),
                   const SizedBox(height: 15),
                   _buildTextField(
                     controller: controller.emailController,
-                    label: 'Email Address',
+                    label: 'Alamat Email',
                     icon: Icons.email_outlined,
                   ),
                   const SizedBox(height: 15),
                   _buildTextField(
                     controller: controller.hpController,
-                    label: 'Phone Number',
+                    label: 'Nomor HP',
                     icon: Icons.phone_android_outlined,
                   ),
                   const SizedBox(height: 20),
@@ -59,8 +59,8 @@ class UserFormView extends GetView<UsersController> {
                     label: 'Status',
                     value: controller.selectedStatusAktif.value,
                     items: const [
-                      DropdownMenuItem(value: 1, child: Text('Active')),
-                      DropdownMenuItem(value: 0, child: Text('Inactive')),
+                      DropdownMenuItem(value: 1, child: Text('Aktif')),
+                      DropdownMenuItem(value: 0, child: Text('Nonaktif')),
                     ],
                     onChanged: (val) => controller.selectedStatusAktif.value = val!,
                   ),
@@ -82,7 +82,7 @@ class UserFormView extends GetView<UsersController> {
                       child: controller.isLoading.value
                           ? const CircularProgressIndicator(color: Colors.white)
                           : Text(
-                              user == null ? 'CREATE USER' : 'UPDATE USER',
+                              user == null ? 'SIMPAN USER' : 'UPDATE USER',
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                             ),
                     ),

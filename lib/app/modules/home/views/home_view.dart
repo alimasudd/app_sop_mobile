@@ -42,14 +42,14 @@ class HomeView extends GetView<HomeController> {
               padding: EdgeInsets.zero,
               children: [
                 _buildMenuItem(0, Icons.dashboard_outlined, 'Dashboard'),
-                _buildMenuItem(1, Icons.people_outline, 'Users'),
+                _buildMenuItem(1, Icons.people_outline, 'Manajemen User'),
                 _buildMenuItem(2, Icons.assignment_outlined, 'Monitor Tugas'),
-                _buildMenuItem(3, Icons.bar_chart_outlined, 'Report'),
-                _buildMenuItem(4, Icons.settings_outlined, 'Setting'),
+                _buildMenuItem(3, Icons.bar_chart_outlined, 'Laporan'),
+                _buildMenuItem(4, Icons.settings_outlined, 'Pengaturan'),
                 const Divider(),
                 ListTile(
                   leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Logout', style: TextStyle(color: Colors.red)),
+                  title: const Text('Keluar', style: TextStyle(color: Colors.red)),
                   onTap: () => controller.logout(),
                 ),
               ],
@@ -78,7 +78,7 @@ class HomeView extends GetView<HomeController> {
           ),
           const SizedBox(height: 10),
           const Text(
-            'Admin Panel',
+            'Panel Admin',
             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           Text(
@@ -118,20 +118,20 @@ class HomeView extends GetView<HomeController> {
   Widget _buildBody(int index) {
     switch (index) {
       case 0:
-        return _buildPlaceholder('Dashboard Overview');
+        return _buildPlaceholder('Ringkasan Dashboard');
       case 1:
         // Use UsersView content directly. 
         // Since UsersView is a Scaffold, we might want to extract its body,
         // but for now, we'll return its internal structure.
         return const UsersView();
       case 2:
-        return _buildPlaceholder('Monitor Tugas Page');
+        return _buildPlaceholder('Halaman Monitor Tugas');
       case 3:
-        return _buildPlaceholder('Reports & Analytics');
+        return _buildPlaceholder('Laporan & Analitik');
       case 4:
-        return _buildPlaceholder('System Settings');
+        return _buildPlaceholder('Pengaturan Sistem');
       default:
-        return _buildPlaceholder('Page Not Found');
+        return _buildPlaceholder('Halaman Tidak Ditemukan');
     }
   }
 
@@ -148,7 +148,7 @@ class HomeView extends GetView<HomeController> {
           ),
           const SizedBox(height: 10),
           Text(
-            'This feature is coming soon.',
+            'Fitur ini akan segera hadir.',
             style: TextStyle(color: Colors.grey[500]),
           ),
         ],
@@ -159,11 +159,11 @@ class HomeView extends GetView<HomeController> {
   String _getTitle(int index) {
     switch (index) {
       case 0: return 'Dashboard';
-      case 1: return 'User Management';
+      case 1: return 'Manajemen User';
       case 2: return 'Monitor Tugas';
-      case 3: return 'Report';
-      case 4: return 'Setting';
-      default: return 'Admin Panel';
+      case 3: return 'Laporan';
+      case 4: return 'Pengaturan';
+      default: return 'Panel Admin';
     }
   }
 }

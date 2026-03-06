@@ -145,13 +145,16 @@ class AuthController extends GetxController {
       if (response.statusCode == 200) {
         Get.snackbar('Sukses', 'Berhasil terhubung ke server API!',
             backgroundColor: Colors.green, colorText: Colors.white);
+        debugPrint('API Health Check: Success');
       } else {
         Get.snackbar('Gagal', 'Server terdeteksi tapi error: ${response.statusCode}',
             backgroundColor: Colors.orange, colorText: Colors.white);
+        debugPrint('API Health Check: Error ${response.statusCode}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal menghubungi API: $e',
           backgroundColor: Colors.red, colorText: Colors.white, duration: const Duration(seconds: 5));
+      debugPrint('API Health Check Exception: $e');
     } finally {
       isLoading.value = false;
     }

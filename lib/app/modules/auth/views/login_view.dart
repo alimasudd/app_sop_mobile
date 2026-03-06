@@ -61,7 +61,7 @@ class LoginView extends GetView<AuthController> {
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: controller.loginEmailController,
-                  hintText: 'harisk@gmail.com',
+                  hintText: 'user@gmail.com',
                   suffixIcon: Icons.email_outlined,
                 ),
                 const SizedBox(height: 20),

@@ -63,7 +63,7 @@ class RegisterView extends GetView<AuthController> {
               const SizedBox(height: 10),
               _buildBoxedTextField(
                 controller: controller.regEmailController,
-                hintText: 'harisk@gmail.com',
+                hintText: 'user@gmail.com',
                 prefixIcon: Icons.email_outlined,
               ),
               const SizedBox(height: 15),

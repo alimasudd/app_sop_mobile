@@ -81,10 +81,10 @@ class HomeView extends GetView<HomeController> {
             'Panel Admin',
             style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          Text(
-            'admin@maret.com',
+          Obx(() => Text(
+            controller.userEmail.value,
             style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
-          ),
+          )),
         ],
       ),
     );

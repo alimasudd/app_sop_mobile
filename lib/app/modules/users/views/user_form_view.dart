@@ -10,151 +10,216 @@ class UserFormView extends GetView<UsersController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        foregroundColor: Colors.white,
-        title: Text(user == null ? 'Tambah User' : 'Edit User'),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
-            ),
-          ),
+        title: Text(
+          user == null ? 'Tambah User' : 'Edit Staf',
+          style: const TextStyle(color: Color(0xFF343A40), fontSize: 18, fontWeight: FontWeight.bold),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        centerTitle: false,
+        actions: [
+           IconButton(
+            icon: const Icon(Icons.close, color: Colors.grey),
+            onPressed: () {
+              FocusManager.instance.primaryFocus?.unfocus();
+              Get.back();
+            },
+          ),
+        ],
+        automaticallyImplyLeading: false,
       ),
-      body: Obx(() {
-        return Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
-              child: Column(
+      body: Stack(
+        children: [
+          Obx(() => SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildLabel('Nama'),
+                _buildStyledTextField(
+                  controller: controller.namaController,
+                  hintText: '',
+                  fillColor: Colors.white,
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel('Email'),
+                _buildStyledTextField(
+                  controller: controller.emailController,
+                  hintText: 'harisk@gmail.com',
+                  fillColor: const Color(0xFFE9F0FF),
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel('Level'),
+                _buildStyledDropdown<int>(
+                  value: controller.selectedLevelId.value,
+                  hintText: '-- Pilih Level --',
+                  items: const [
+                    DropdownMenuItem(value: 1, child: Text('Admin')),
+                    DropdownMenuItem(value: 2, child: Text('User')),
+                    DropdownMenuItem(value: 5, child: Text('Staff')),
+                  ],
+                  onChanged: (val) => controller.selectedLevelId.value = val,
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel('Jabatan'),
+                _buildStyledDropdown<String>(
+                  value: controller.jabatanController.text.isEmpty ? null : controller.jabatanController.text,
+                  hintText: '-',
+                  items: const [
+                    DropdownMenuItem(value: 'Staff IT', child: Text('Staff IT')),
+                    DropdownMenuItem(value: 'Manager', child: Text('Manager')),
+                    DropdownMenuItem(value: 'Admin Keuangan', child: Text('Admin Keuangan')),
+                  ],
+                  onChanged: (val) => controller.jabatanController.text = val ?? '',
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel(user == null ? 'Password' : 'Password (Kosongkan jika tidak ubah)'),
+                _buildStyledTextField(
+                  controller: controller.passwordController,
+                  hintText: '********',
+                  fillColor: const Color(0xFFE9F0FF),
+                  isPassword: true,
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel('No HP'),
+                _buildStyledTextField(
+                  controller: controller.hpController,
+                  hintText: '',
+                  fillColor: Colors.white,
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 16),
+
+                _buildLabel('Status'),
+                _buildStyledDropdown<int>(
+                  value: controller.selectedStatusAktif.value,
+                  hintText: 'Pilih Status',
+                  items: const [
+                    DropdownMenuItem(value: 1, child: Text('Aktif')),
+                    DropdownMenuItem(value: 0, child: Text('Tidak Aktif')),
+                  ],
+                  onChanged: (val) => controller.selectedStatusAktif.value = val ?? 1,
+                ),
+                const SizedBox(height: 100), // Space for buttons
+              ],
+            ),
+          )),
+          
+          // Action Buttons at Bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+              decoration: const BoxDecoration(
+                color: Color(0xFFF8F9FA),
+                border: Border(top: BorderSide(color: Color(0xFFEEEEEE))),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _buildTextField(
-                    controller: controller.namaController,
-                    label: 'Nama Lengkap',
-                    icon: Icons.person_outline,
+                   // Batal Button
+                  TextButton(
+                    onPressed: () {
+                      FocusManager.instance.primaryFocus?.unfocus();
+                      Get.back();
+                    },
+                    child: const Text('Batal', style: TextStyle(color: Color(0xFF495057))),
                   ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: controller.emailController,
-                    label: 'Alamat Email',
-                    icon: Icons.email_outlined,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildTextField(
-                    controller: controller.hpController,
-                    label: 'Nomor HP',
-                    icon: Icons.phone_android_outlined,
-                  ),
-                  const SizedBox(height: 20),
-                  _buildDropdown<int>(
-                    label: 'Level',
-                    value: [1, 2, 5].contains(controller.selectedLevelId.value) 
-                        ? controller.selectedLevelId.value 
-                        : 2, // Default to 2 if current value is unknown
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('Admin')),
-                      DropdownMenuItem(value: 2, child: Text('User')),
-                      DropdownMenuItem(value: 5, child: Text('Staff')),
-                    ],
-                    onChanged: (val) => controller.selectedLevelId.value = val!,
-                  ),
-                  const SizedBox(height: 15),
-                  _buildDropdown<int>(
-                    label: 'Status',
-                    value: [0, 1].contains(controller.selectedStatusAktif.value)
-                        ? controller.selectedStatusAktif.value
-                        : 1, // Default to 1 (Active)
-                    items: const [
-                      DropdownMenuItem(value: 1, child: Text('Aktif')),
-                      DropdownMenuItem(value: 0, child: Text('Nonaktif')),
-                    ],
-                    onChanged: (val) => controller.selectedStatusAktif.value = val!,
-                  ),
-                  const SizedBox(height: 40),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: controller.isLoading.value
-                          ? null
-                          : () => controller.saveUser(user?.id),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF2575FC),
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      child: controller.isLoading.value
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : Text(
-                              user == null ? 'SIMPAN USER' : 'UPDATE USER',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                            ),
+                  const SizedBox(width: 12),
+                  // Update/Simpan Button
+                  Obx(() => ElevatedButton(
+                    onPressed: controller.isLoading.value ? null : () => controller.saveUser(user?.id),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF1B4EAA),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      elevation: 2,
                     ),
-                  ),
+                    child: controller.isLoading.value
+                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                        : Text(user == null ? 'SIMPAN' : 'UPDATE', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  )),
                 ],
               ),
             ),
-            if (controller.isLoading.value)
-              Container(
-                color: Colors.black12,
-                child: const Center(child: CircularProgressIndicator()),
-              ),
-          ],
-        );
-      }),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildLabel(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
+      ),
+    );
+  }
+
+  Widget _buildStyledTextField({
     required TextEditingController controller,
-    required String label,
-    required IconData icon,
+    required String hintText,
+    required Color fillColor,
+    bool isPassword = false,
+    TextInputType keyboardType = TextInputType.text,
   }) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, color: const Color(0xFF2575FC)),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(15)),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFF2575FC), width: 2),
+    return Container(
+      decoration: BoxDecoration(
+        color: fillColor,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFDDE2E5)),
+      ),
+      child: TextField(
+        controller: controller,
+        obscureText: isPassword,
+        keyboardType: keyboardType,
+        style: const TextStyle(color: Color(0xFF495057)),
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Color(0xFFADB5BD)),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         ),
       ),
     );
   }
 
-  Widget _buildDropdown<T>({
-    required String label,
-    required T value,
+  Widget _buildStyledDropdown<T>({
+    required T? value,
+    required String hintText,
     required List<DropdownMenuItem<T>> items,
     required Function(T?) onChanged,
   }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: const Color(0xFFDDE2E5)),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<T>(
+          value: value,
+          isExpanded: true,
+          hint: Text(hintText, style: const TextStyle(color: Color(0xFFADB5BD), fontSize: 14)),
+          items: items,
+          onChanged: onChanged,
+          icon: const Icon(Icons.keyboard_arrow_down, color: Color(0xFF495057)),
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.grey),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: DropdownButtonHideUnderline(
-            child: DropdownButton<T>(
-              value: value,
-              isExpanded: true,
-              items: items,
-              onChanged: onChanged,
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

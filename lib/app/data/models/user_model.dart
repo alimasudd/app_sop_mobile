@@ -6,6 +6,8 @@ class UserModel {
   String? nik;
   int? levelId;
   int? statusAktif;
+  String? password;
+  String? jabatan;
 
   UserModel({
     this.id,
@@ -13,18 +15,29 @@ class UserModel {
     this.email,
     this.hp,
     this.nik,
+    this.password,
+    this.jabatan,
     this.levelId,
     this.statusAktif,
   });
 
   UserModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    nama = json['nama'];
-    email = json['email'];
-    hp = json['hp'];
-    nik = json['nik'];
-    levelId = json['levelId'] ?? json['level_id'];
-    statusAktif = json['statusAktif'] ?? json['status_aktif'];
+    id = _toInt(json['id']);
+    nama = json['nama']?.toString();
+    email = json['email']?.toString();
+    hp = json['hp']?.toString();
+    nik = json['nik']?.toString();
+    jabatan = json['jabatan']?.toString();
+    levelId = _toInt(json['levelId'] ?? json['level_id']);
+    statusAktif = _toInt(json['statusAktif'] ?? json['status_aktif']);
+  }
+
+  // Helper to safely parse int from String or int
+  int? _toInt(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return value;
+    if (value is String) return int.tryParse(value);
+    return null;
   }
 
   Map<String, dynamic> toJson() {
@@ -34,8 +47,10 @@ class UserModel {
     data['email'] = email;
     data['hp'] = hp;
     data['nik'] = nik;
-    data['levelId'] = levelId;
-    data['statusAktif'] = statusAktif;
+    data['password'] = password;
+    data['jabatan'] = jabatan;
+    data['level_id'] = levelId;
+    data['status_aktif'] = statusAktif;
     return data;
   }
 }

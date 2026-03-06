@@ -31,9 +31,12 @@ class AuthController extends GetxController {
     if (loginEmailController.text.isEmpty || loginPasswordController.text.isEmpty) {
       Get.snackbar('Error', 'Email dan password wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Validation Error: Email and password are empty');
       return;
     }
+
+    // Unfocus and small delay to ensure keyboard is closing
+    FocusManager.instance.primaryFocus?.unfocus();
+    await Future.delayed(const Duration(milliseconds: 100));
 
     isLoading.value = true;
     try {
@@ -51,7 +54,6 @@ class AuthController extends GetxController {
                         data['data']?['token'] ?? 
                         data['data']?['access_token'];
         
-        // Extract user email if available in response
         String? userEmail = data['user']?['email'] ?? data['data']?['user']?['email'] ?? loginEmailController.text;
 
         if (token != null) {
@@ -67,19 +69,16 @@ class AuthController extends GetxController {
           
           Get.offAllNamed(Routes.HOME);
         } else {
-          print('DEBUG: Token missing in response. Data was: $data');
-          Get.snackbar('Token Tidak Ditemukan', 'Isi Response: ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}',
-              backgroundColor: Colors.orange, colorText: Colors.white, duration: const Duration(seconds: 10));
+          Get.snackbar('Token Tidak Ditemukan', 'Login sukses tapi token tidak ditemukan dalam respon.',
+              backgroundColor: Colors.orange, colorText: Colors.white);
         }
       } else {
         Get.snackbar('Gagal', data['message'] ?? 'Login gagal',
             backgroundColor: Colors.red, colorText: Colors.white);
-        debugPrint('Login API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Login Exception: $e');
     } finally {
       isLoading.value = false;
     }
@@ -89,7 +88,6 @@ class AuthController extends GetxController {
     if (regNikController.text.length != 16) {
       Get.snackbar('Error', 'NIK harus 16 digit',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Validation Error: NIK length is ${regNikController.text.length}, expected 16');
       return;
     }
 
@@ -99,9 +97,12 @@ class AuthController extends GetxController {
         regHpController.text.isEmpty) {
       Get.snackbar('Error', 'Semua kolom wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Validation Error: Registration fields are incomplete');
       return;
     }
+
+    // Unfocus and small delay
+    FocusManager.instance.primaryFocus?.unfocus();
+    await Future.delayed(const Duration(milliseconds: 100));
 
     isLoading.value = true;
     try {
@@ -120,41 +121,34 @@ class AuthController extends GetxController {
       if (response.statusCode == 201 || response.statusCode == 200) {
         Get.snackbar('Sukses', 'Akun berhasil dibuat, silakan login',
             backgroundColor: Colors.green, colorText: Colors.white);
-        debugPrint('Registration Success');
-        
-        // Return to login page
         Get.offAllNamed(Routes.LOGIN); 
       } else {
         Get.snackbar('Gagal', data['message'] ?? 'Registrasi gagal',
             backgroundColor: Colors.red, colorText: Colors.white);
-        debugPrint('Registration API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Registration Exception: $e');
     } finally {
       isLoading.value = false;
     }
   }
 
   void testApi() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     isLoading.value = true;
     try {
       final response = await _apiProvider.checkHealth();
       if (response.statusCode == 200) {
         Get.snackbar('Sukses', 'Berhasil terhubung ke server API!',
             backgroundColor: Colors.green, colorText: Colors.white);
-        debugPrint('API Health Check: Success');
       } else {
         Get.snackbar('Gagal', 'Server terdeteksi tapi error: ${response.statusCode}',
             backgroundColor: Colors.orange, colorText: Colors.white);
-        debugPrint('API Health Check: Error ${response.statusCode}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal menghubungi API: $e',
-          backgroundColor: Colors.red, colorText: Colors.white, duration: const Duration(seconds: 5));
-      debugPrint('API Health Check Exception: $e');
+          backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading.value = false;
     }

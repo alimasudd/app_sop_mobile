@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'app/routes/app_pages.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:test_maret/app/routes/app_pages.dart';
 
 void main() async {
-  await GetStorage.init();
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  final prefs = await SharedPreferences.getInstance();
+  String? token = prefs.getString('token');
+  
   runApp(
     GetMaterialApp(
       title: "Application",
-      initialRoute: AppPages.INITIAL,
+      initialRoute: token != null ? Routes.HOME : Routes.LOGIN,
       getPages: AppPages.routes,
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        useMaterial3: true,
+      ),
     ),
   );
 }
-

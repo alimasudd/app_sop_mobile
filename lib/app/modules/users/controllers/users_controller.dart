@@ -34,8 +34,9 @@ class UsersController extends GetxController {
       users.assignAll(data);
       filteredUsers.assignAll(data);
     } catch (e) {
-      Get.snackbar('Error', 'Failed to fetch users: $e',
+      Get.snackbar('Error', 'Gagal mengambil data user: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Fetch Users Error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -72,8 +73,9 @@ class UsersController extends GetxController {
 
   void saveUser([int? id]) async {
     if (namaController.text.isEmpty || emailController.text.isEmpty) {
-      Get.snackbar('Error', 'Name and Email are required',
+      Get.snackbar('Error', 'Nama dan Email wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Validation Error: Name or Email is empty');
       return;
     }
 
@@ -90,19 +92,27 @@ class UsersController extends GetxController {
       if (id == null) {
         // Create
         await _apiProvider.createUser(user);
-        Get.snackbar('Success', 'User created successfully',
+        Get.snackbar('Sukses', 'User berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
+        debugPrint('Create User Success');
       } else {
         // Update
         await _apiProvider.updateUser(id, user);
-        Get.snackbar('Success', 'User updated successfully',
+        Get.snackbar('Sukses', 'User berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
+        debugPrint('Update User Success for ID: $id');
       }
+      
+      // Refresh list
       fetchUsers();
-      Get.back();
+      
+      // Close form
+      FocusManager.instance.primaryFocus?.unfocus();
+      Get.back(); 
     } catch (e) {
-      Get.snackbar('Error', 'Operation failed: $e',
+      Get.snackbar('Error', 'Gagal menyimpan data: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Save User Error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -120,12 +130,14 @@ class UsersController extends GetxController {
         isLoading.value = true;
         try {
           await _apiProvider.deleteUser(id);
-          Get.snackbar('Success', 'User deleted successfully',
+          Get.snackbar('Sukses', 'User berhasil dihapus',
               backgroundColor: Colors.green, colorText: Colors.white);
+          debugPrint('Delete User Success for ID: $id');
           fetchUsers();
         } catch (e) {
-          Get.snackbar('Error', 'Failed to delete user: $e',
+          Get.snackbar('Error', 'Gagal menghapus user: $e',
               backgroundColor: Colors.red, colorText: Colors.white);
+          debugPrint('Delete User Error: $e');
         } finally {
           isLoading.value = false;
         }

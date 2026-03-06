@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import '../../data/providers/api_provider.dart';
-import '../../../routes/app_pages.dart';
+import 'package:test_maret/app/data/providers/api_provider.dart';
+import 'package:test_maret/app/routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();

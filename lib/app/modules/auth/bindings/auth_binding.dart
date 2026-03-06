@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
-import '../controllers/auth_controller.dart';
+import 'package:test_maret/app/modules/auth/controllers/auth_controller.dart';
 
 class AuthBinding extends Bindings {
   @override

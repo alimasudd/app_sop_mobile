@@ -1,13 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_maret/app/data/providers/api_provider.dart';
 import 'package:test_maret/app/routes/app_pages.dart';
 
 class AuthController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
-  final GetStorage _storage = GetStorage();
 
   final isLoading = false.obs;
   final rememberMe = false.obs;
@@ -51,13 +50,21 @@ class AuthController extends GetxController {
                         data['access_token'] ?? 
                         data['data']?['token'] ?? 
                         data['data']?['access_token'];
+        
+        // Extract user email if available in response
+        String? userEmail = data['user']?['email'] ?? data['data']?['user']?['email'] ?? loginEmailController.text;
+
         if (token != null) {
-          _storage.write('token', token);
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('user_email', userEmail ?? '');
+          
           if (rememberMe.value) {
-            _storage.write('remember_email', loginEmailController.text);
+            await prefs.setString('remember_email', loginEmailController.text);
           } else {
-            _storage.remove('remember_email');
+            await prefs.remove('remember_email');
           }
+          
           Get.offAllNamed(Routes.HOME);
         } else {
           print('DEBUG: Token missing in response. Data was: $data');
@@ -111,10 +118,12 @@ class AuthController extends GetxController {
       final data = json.decode(response.body);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        Get.snackbar('Sukses', 'Akun berhasil dibuat',
+        Get.snackbar('Sukses', 'Akun berhasil dibuat, silakan login',
             backgroundColor: Colors.green, colorText: Colors.white);
         debugPrint('Registration Success');
-        Get.back();
+        
+        // Return to login page
+        Get.offAllNamed(Routes.LOGIN); 
       } else {
         Get.snackbar('Gagal', data['message'] ?? 'Registrasi gagal',
             backgroundColor: Colors.red, colorText: Colors.white);
@@ -151,7 +160,12 @@ class AuthController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    String? rememberedEmail = _storage.read('remember_email');
+    _loadRememberedEmail();
+  }
+
+  void _loadRememberedEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? rememberedEmail = prefs.getString('remember_email');
     if (rememberedEmail != null) {
       loginEmailController.text = rememberedEmail;
       rememberMe.value = true;

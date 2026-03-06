@@ -1,27 +1,33 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_maret/app/routes/app_pages.dart';
 
 class HomeController extends GetxController {
-  var selectedIndex = 0.obs;
-  final storage = GetStorage();
+  final selectedIndex = 0.obs;
+  final userEmail = 'admin@maret.com'.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    _loadUserEmail();
+  }
+
+  void _loadUserEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? email = prefs.getString('user_email');
+    if (email != null && email.isNotEmpty) {
+      userEmail.value = email;
+    }
+  }
 
   void changeIndex(int index) {
     selectedIndex.value = index;
   }
 
-  void logout() {
-    Get.defaultDialog(
-      title: 'Logout',
-      middleText: 'Are you sure you want to logout?',
-      textConfirm: 'Yes',
-      textCancel: 'No',
-      confirmTextColor: Colors.white,
-      onConfirm: () {
-        storage.remove('token');
-        Get.offAllNamed(Routes.LOGIN);
-      },
-    );
+  void logout() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('token');
+    await prefs.remove('user_email');
+    Get.offAllNamed(Routes.LOGIN);
   }
 }

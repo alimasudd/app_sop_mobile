@@ -10,21 +10,29 @@ class AuthController extends GetxController {
   final GetStorage _storage = GetStorage();
 
   final isLoading = false.obs;
+  final rememberMe = false.obs;
+  final isPasswordVisible = false.obs;
 
   // Controllers for Login
   final loginEmailController = TextEditingController();
   final loginPasswordController = TextEditingController();
 
   // Controllers for Register
+  final regNikController = TextEditingController();
   final regNamaController = TextEditingController();
   final regEmailController = TextEditingController();
   final regPasswordController = TextEditingController();
   final regHpController = TextEditingController();
 
+  void togglePasswordVisibility() {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  }
+
   void login() async {
     if (loginEmailController.text.isEmpty || loginPasswordController.text.isEmpty) {
-      Get.snackbar('Error', 'Email and password are required',
+      Get.snackbar('Error', 'Email dan password wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Validation Error: Email and password are empty');
       return;
     }
 
@@ -36,65 +44,117 @@ class AuthController extends GetxController {
       );
 
       final data = json.decode(response.body);
+      debugPrint('Login Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        // Assuming the API returns token in 'token' or 'data.token'
-        String token = data['token'] ?? data['data']?['token'];
+        String? token = data['token'] ?? 
+                        data['access_token'] ?? 
+                        data['data']?['token'] ?? 
+                        data['data']?['access_token'];
         if (token != null) {
           _storage.write('token', token);
+          if (rememberMe.value) {
+            _storage.write('remember_email', loginEmailController.text);
+          } else {
+            _storage.remove('remember_email');
+          }
           Get.offAllNamed(Routes.HOME);
         } else {
-          Get.snackbar('Success', 'Login successful, but no token received.',
-              backgroundColor: Colors.orange, colorText: Colors.white);
+          print('DEBUG: Token missing in response. Data was: $data');
+          Get.snackbar('Token Tidak Ditemukan', 'Isi Response: ${response.body.substring(0, response.body.length > 100 ? 100 : response.body.length)}',
+              backgroundColor: Colors.orange, colorText: Colors.white, duration: const Duration(seconds: 10));
         }
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Login failed',
+        Get.snackbar('Gagal', data['message'] ?? 'Login gagal',
             backgroundColor: Colors.red, colorText: Colors.white);
+        debugPrint('Login API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An unexpected error occurred: $e',
+      Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Login Exception: $e');
     } finally {
       isLoading.value = false;
     }
   }
 
   void register() async {
+    if (regNikController.text.length != 16) {
+      Get.snackbar('Error', 'NIK harus 16 digit',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Validation Error: NIK length is ${regNikController.text.length}, expected 16');
+      return;
+    }
+
     if (regNamaController.text.isEmpty ||
         regEmailController.text.isEmpty ||
         regPasswordController.text.isEmpty ||
         regHpController.text.isEmpty) {
-      Get.snackbar('Error', 'All fields are required',
+      Get.snackbar('Error', 'Semua kolom wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Validation Error: Registration fields are incomplete');
       return;
     }
 
     isLoading.value = true;
     try {
       final response = await _apiProvider.register({
+        'nik': regNikController.text,
         'nama': regNamaController.text,
         'email': regEmailController.text,
         'password': regPasswordController.text,
         'hp': regHpController.text,
-        'level_id': 2, // Default level
-        'status_aktif': 1, // Default status
+        'level_id': 2,
+        'status_aktif': 1,
       });
 
       final data = json.decode(response.body);
 
       if (response.statusCode == 201 || response.statusCode == 200) {
-        Get.snackbar('Success', 'Account created successfully',
+        Get.snackbar('Sukses', 'Akun berhasil dibuat',
             backgroundColor: Colors.green, colorText: Colors.white);
-        Get.back(); // Go back to login
+        debugPrint('Registration Success');
+        Get.back();
       } else {
-        Get.snackbar('Error', data['message'] ?? 'Registration failed',
+        Get.snackbar('Gagal', data['message'] ?? 'Registrasi gagal',
             backgroundColor: Colors.red, colorText: Colors.white);
+        debugPrint('Registration API Error: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      Get.snackbar('Error', 'An unexpected error occurred: $e',
+      Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Registration Exception: $e');
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  void testApi() async {
+    isLoading.value = true;
+    try {
+      final response = await _apiProvider.checkHealth();
+      if (response.statusCode == 200) {
+        Get.snackbar('Sukses', 'Berhasil terhubung ke server API!',
+            backgroundColor: Colors.green, colorText: Colors.white);
+      } else {
+        Get.snackbar('Gagal', 'Server terdeteksi tapi error: ${response.statusCode}',
+            backgroundColor: Colors.orange, colorText: Colors.white);
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menghubungi API: $e',
+          backgroundColor: Colors.red, colorText: Colors.white, duration: const Duration(seconds: 5));
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
+    String? rememberedEmail = _storage.read('remember_email');
+    if (rememberedEmail != null) {
+      loginEmailController.text = rememberedEmail;
+      rememberMe.value = true;
     }
   }
 
@@ -102,6 +162,7 @@ class AuthController extends GetxController {
   void onClose() {
     loginEmailController.dispose();
     loginPasswordController.dispose();
+    regNikController.dispose();
     regNamaController.dispose();
     regEmailController.dispose();
     regPasswordController.dispose();

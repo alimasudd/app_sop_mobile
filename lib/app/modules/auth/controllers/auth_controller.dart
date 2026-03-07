@@ -49,17 +49,31 @@ class AuthController extends GetxController {
       debugPrint('Login Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
-        String? token = data['token'] ?? 
-                        data['access_token'] ?? 
+        String? token = data['access_token'] ?? 
+                        data['token'] ?? 
                         data['data']?['token'] ?? 
                         data['data']?['access_token'];
         
-        String? userEmail = data['user']?['email'] ?? data['data']?['user']?['email'] ?? loginEmailController.text;
-
         if (token != null) {
+          // Fetch Profile after successful login to get level_id and name
+          final profileResponse = await _apiProvider.getProfile(token);
+          final profileData = json.decode(profileResponse.body);
+          
+          String userEmail = profileData['data']?['email']?.toString() ?? loginEmailController.text;
+          String userName = profileData['data']?['nama']?.toString() ?? 'User';
+          var rawLevelId = profileData['data']?['level_id'];
+          int? levelId;
+          if (rawLevelId != null) {
+            levelId = int.tryParse(rawLevelId.toString());
+          }
+
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('token', token);
-          await prefs.setString('user_email', userEmail ?? '');
+          await prefs.setString('user_email', userEmail);
+          await prefs.setString('user_name', userName);
+          if (levelId != null) {
+            await prefs.setInt('level_id', levelId);
+          }
           
           if (rememberMe.value) {
             await prefs.setString('remember_email', loginEmailController.text);
@@ -79,6 +93,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Login Error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -129,6 +144,7 @@ class AuthController extends GetxController {
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Register Error: $e');
     } finally {
       isLoading.value = false;
     }

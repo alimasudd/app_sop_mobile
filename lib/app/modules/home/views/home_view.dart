@@ -9,6 +9,8 @@ import 'package:app_sop/app/modules/area/views/area_view.dart';
 import 'package:app_sop/app/modules/area/bindings/area_binding.dart';
 import 'package:app_sop/app/modules/ruang/views/ruang_view.dart';
 import 'package:app_sop/app/modules/ruang/bindings/ruang_binding.dart';
+import 'package:app_sop/app/modules/kategori_sop/views/kategori_sop_view.dart';
+import 'package:app_sop/app/modules/kategori_sop/bindings/kategori_sop_binding.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
@@ -26,6 +28,9 @@ class HomeView extends GetView<HomeController> {
     }
     if (!Get.isRegistered<RuangBinding>()) {
       RuangBinding().dependencies(); 
+    }
+    if (!Get.isRegistered<KategoriSopBinding>()) {
+      KategoriSopBinding().dependencies(); 
     }
 
     return Scaffold(
@@ -250,7 +255,7 @@ class HomeView extends GetView<HomeController> {
       case 11: return const RuangView();
       case 2: return _buildPlaceholder('Pengawas SOP Harian');
       case 3: return _buildPlaceholder('Monitor Tugas');
-      case 12: return _buildPlaceholder('Master: Kategori SOP');
+      case 12: return const KategoriSopView();
       case 13: return _buildPlaceholder('Master: SOP');
       case 14: return _buildPlaceholder('Master: Langkah SOP');
       case 15: return _buildPlaceholder('Master: Tugas SOP');
@@ -303,7 +308,7 @@ class HomeView extends GetView<HomeController> {
       case 11: return 'Manajemen Ruang';
       case 2: return 'Pengawas SOP Harian';
       case 3: return 'Monitor Tugas';
-      case 12: return 'Master: Kategori SOP';
+      case 12: return 'Kategori SOP';
       case 13: return 'Master: SOP';
       case 14: return 'Master: Langkah SOP';
       case 15: return 'Master: Tugas SOP';

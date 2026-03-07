@@ -10,6 +10,8 @@ import '../modules/ruang/bindings/ruang_binding.dart';
 import '../modules/ruang/views/ruang_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
+import '../modules/kategori_sop/bindings/kategori_sop_binding.dart';
+import '../modules/kategori_sop/views/kategori_sop_view.dart';
 
 part 'app_routes.dart';
 
@@ -48,6 +50,11 @@ class AppPages {
       name: _Paths.RUANG,
       page: () => const RuangView(),
       binding: RuangBinding(),
+    ),
+    GetPage(
+      name: _Paths.KATEGORI_SOP,
+      page: () => const KategoriSopView(),
+      binding: KategoriSopBinding(),
     ),
   ];
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:test_maret/app/modules/home/bindings/home_binding.dart';
+import 'package:test_maret/app/modules/home/views/dashboard_view.dart';
 import 'package:test_maret/app/modules/home/controllers/home_controller.dart';
 import 'package:test_maret/app/modules/users/views/users_view.dart';
 import 'package:test_maret/app/modules/users/bindings/users_binding.dart';
@@ -194,7 +196,7 @@ class HomeView extends GetView<HomeController> {
 
   Widget _buildBody(int index) {
     switch (index) {
-      case 0: return _buildPlaceholder('Ringkasan Dashboard');
+      case 0: return const DashboardView();
       case 1: return const UsersView();
       case 101: return _buildPlaceholder('Master: Daftar Area');
       case 102: return _buildPlaceholder('Master: Tipe Area');

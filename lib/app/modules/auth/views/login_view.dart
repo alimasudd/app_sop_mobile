@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maret/app/routes/app_pages.dart';
-import 'package:test_maret/app/modules/auth/controllers/auth_controller.dart';
+import 'package:app_sop/app/routes/app_pages.dart';
+import 'package:app_sop/app/modules/auth/controllers/auth_controller.dart';
 
 class LoginView extends GetView<AuthController> {
   const LoginView({Key? key}) : super(key: key);

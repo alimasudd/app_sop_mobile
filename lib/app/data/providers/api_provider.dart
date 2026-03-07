@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_maret/app/data/models/user_model.dart';
+import 'package:app_sop/app/data/models/user_model.dart';
 
 class ApiProvider {
   final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";

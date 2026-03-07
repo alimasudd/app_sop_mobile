@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maret/app/data/models/user_model.dart';
-import 'package:test_maret/app/modules/users/controllers/users_controller.dart';
+import 'package:app_sop/app/data/models/user_model.dart';
+import 'package:app_sop/app/modules/users/controllers/users_controller.dart';
 
 class UserFormView extends GetView<UsersController> {
   final UserModel? user;

@@ -1,4 +1,4 @@
-package com.tstmrt.test_maret;
+package com.appsop.app_sop;
 
 import io.flutter.embedding.android.FlutterActivity;
 

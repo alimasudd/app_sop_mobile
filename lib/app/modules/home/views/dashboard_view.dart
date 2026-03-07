@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maret/app/modules/home/controllers/home_controller.dart';
+import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
 
 class DashboardView extends GetView<HomeController> {
   const DashboardView({Key? key}) : super(key: key);

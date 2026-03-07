@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:test_maret/app/routes/app_pages.dart';
+import 'package:app_sop/app/routes/app_pages.dart';
 
 class HomeController extends GetxController {
   final selectedIndex = 0.obs;

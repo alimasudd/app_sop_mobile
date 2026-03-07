@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maret/app/modules/home/bindings/home_binding.dart';
-import 'package:test_maret/app/modules/home/views/dashboard_view.dart';
-import 'package:test_maret/app/modules/home/controllers/home_controller.dart';
-import 'package:test_maret/app/modules/users/views/users_view.dart';
-import 'package:test_maret/app/modules/users/bindings/users_binding.dart';
+import 'package:app_sop/app/modules/home/bindings/home_binding.dart';
+import 'package:app_sop/app/modules/home/views/dashboard_view.dart';
+import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
+import 'package:app_sop/app/modules/users/views/users_view.dart';
+import 'package:app_sop/app/modules/users/bindings/users_binding.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);

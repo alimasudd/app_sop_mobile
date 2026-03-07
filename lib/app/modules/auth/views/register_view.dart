@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:test_maret/app/modules/auth/controllers/auth_controller.dart';
+import 'package:app_sop/app/modules/auth/controllers/auth_controller.dart';
 
 class RegisterView extends GetView<AuthController> {
   const RegisterView({Key? key}) : super(key: key);

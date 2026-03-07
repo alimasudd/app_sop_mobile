@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/ruang_model.dart';
 import 'package:app_sop/app/data/models/area_model.dart';
+import 'package:app_sop/app/data/providers/api_provider.dart';
 
 class RuangController extends GetxController {
+  final ApiProvider _apiProvider = ApiProvider();
   var rooms = <RuangModel>[].obs;
-  var filteredRooms = <RuangModel>[].obs;
   var areas = <AreaModel>[].obs;
   var isLoading = false.obs;
 
@@ -23,47 +24,46 @@ class RuangController extends GetxController {
     fetchInitialData();
   }
 
-  void fetchInitialData() {
+  Future<void> fetchInitialData() async {
     isLoading.value = true;
-    
-    // Dummy Areas
-    var dummyAreas = [
-      AreaModel(id: 1, namaArea: 'HO'),
-      AreaModel(id: 2, namaArea: 'Pabrik Garam Sulawesi'),
-      AreaModel(id: 3, namaArea: 'Kantor PKBM ISESW'),
-      AreaModel(id: 4, namaArea: 'Kantor PKBM Isesw'),
-    ];
-    areas.assignAll(dummyAreas);
+    try {
+      final areaData = await _apiProvider.getAreas();
+      areas.assignAll(areaData);
+      
+      final roomData = await _apiProvider.getRuangs();
+      rooms.assignAll(roomData);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memuat data: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Fetch Initial Data Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
+  }
 
-    // Dummy Rooms based on screenshot
-    var dummyRooms = [
-      RuangModel(id: 1, areaId: 1, namaArea: 'HO', namaRuang: 'SERVER GA', deskripsi: 'SERVER GA', createdAt: '25/02/2026 08:54'),
-      RuangModel(id: 2, areaId: 4, namaArea: 'Kantor PKBM Isesw', namaRuang: 'Ruang Staf TU', deskripsi: 'Ruang kerja staf Tata Usaha', createdAt: '08/02/2026 06:29'),
-      RuangModel(id: 3, areaId: 4, namaArea: 'Kantor PKBM Isesw', namaRuang: 'Ruang Kursus Komputer Tengah', deskripsi: 'Ruang untuk kursus komputer di tengah gedung', createdAt: '08/02/2026 06:29'),
-    ];
-    
-    rooms.assignAll(dummyRooms);
-    filteredRooms.assignAll(dummyRooms);
-    isLoading.value = false;
+  Future<void> fetchRooms({String? query}) async {
+    isLoading.value = true;
+    try {
+      final data = await _apiProvider.getRuangs(search: query);
+      rooms.assignAll(data);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memuat ruang: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Fetch Rooms Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void searchRoom(String query) {
-    if (query.isEmpty) {
-      filteredRooms.assignAll(rooms);
-    } else {
-      filteredRooms.assignAll(rooms.where((room) {
-        return (room.namaRuang?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-               (room.namaArea?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-               (room.deskripsi?.toLowerCase().contains(query.toLowerCase()) ?? false);
-      }).toList());
-    }
+    fetchRooms(query: query);
   }
 
   void setupForm([RuangModel? room]) {
     if (room != null) {
       selectedAreaId.value = room.areaId;
-      namaRuangController.text = room.namaRuang ?? '';
-      deskripsiController.text = room.deskripsi ?? '';
+      namaRuangController.text = room.nama ?? '';
+      deskripsiController.text = room.des ?? '';
     } else {
       selectedAreaId.value = null;
       namaRuangController.clear();
@@ -71,7 +71,8 @@ class RuangController extends GetxController {
     }
   }
 
-  void saveRoom([int? id]) {
+  Future<void> saveRoom([int? id]) async {
+    debugPrint('saveRoom called with id: $id');
     if (selectedAreaId.value == null) {
       Get.snackbar('Error', 'Area wajib dipilih',
           backgroundColor: Colors.red, colorText: Colors.white);
@@ -84,41 +85,36 @@ class RuangController extends GetxController {
     }
 
     isLoading.value = true;
-    
-    // Simulate API delay
-    Future.delayed(const Duration(milliseconds: 500), () {
-      final area = areas.firstWhere((a) => a.id == selectedAreaId.value);
-      
+    try {
+      final roomData = RuangModel(
+        areaId: selectedAreaId.value,
+        nama: namaRuangController.text,
+        des: deskripsiController.text,
+      );
+
       if (id == null) {
-        final newRoom = RuangModel(
-          id: rooms.length + 1,
-          areaId: selectedAreaId.value,
-          namaArea: area.namaArea,
-          namaRuang: namaRuangController.text,
-          deskripsi: deskripsiController.text,
-          createdAt: DateTime.now().toString().substring(0, 16),
-        );
-        rooms.add(newRoom);
-        Get.back();
+        await _apiProvider.createRuang(roomData);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (Get.isDialogOpen ?? false) Get.back();
         Get.snackbar('Sukses', 'Ruang berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
-        int index = rooms.indexWhere((element) => element.id == id);
-        if (index != -1) {
-          rooms[index].areaId = selectedAreaId.value;
-          rooms[index].namaArea = area.namaArea;
-          rooms[index].namaRuang = namaRuangController.text;
-          rooms[index].deskripsi = deskripsiController.text;
-          rooms.refresh();
-        }
-        Get.back();
+        await _apiProvider.updateRuang(id, roomData);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (Get.isDialogOpen ?? false) Get.back();
         Get.snackbar('Sukses', 'Ruang berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
       }
-      
-      searchRoom(searchController.text);
+      fetchRooms(query: searchController.text);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menyimpan ruang: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Save Room Error: $e');
+    } finally {
       isLoading.value = false;
-    });
+    }
   }
 
   void deleteRoom(int id) {
@@ -130,12 +126,21 @@ class RuangController extends GetxController {
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           ElevatedButton(
-            onPressed: () {
-              rooms.removeWhere((element) => element.id == id);
-              searchRoom(searchController.text);
+            onPressed: () async {
               Get.back();
-              Get.snackbar('Sukses', 'Ruang berhasil dihapus',
-                  backgroundColor: Colors.green, colorText: Colors.white);
+              isLoading.value = true;
+              try {
+                await _apiProvider.deleteRuang(id);
+                Get.snackbar('Sukses', 'Ruang berhasil dihapus',
+                    backgroundColor: Colors.green, colorText: Colors.white);
+                fetchRooms(query: searchController.text);
+              } catch (e) {
+                Get.snackbar('Error', 'Gagal menghapus ruang: $e',
+                    backgroundColor: Colors.red, colorText: Colors.white);
+                debugPrint('Delete Room Error: $e');
+              } finally {
+                isLoading.value = false;
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             child: const Text('Hapus'),
@@ -147,9 +152,6 @@ class RuangController extends GetxController {
 
   @override
   void onClose() {
-    searchController.dispose();
-    namaRuangController.dispose();
-    deskripsiController.dispose();
     super.onClose();
   }
 }

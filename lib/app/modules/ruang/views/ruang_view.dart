@@ -20,14 +20,14 @@ class RuangView extends GetView<RuangController> {
               if (controller.isLoading.value && controller.rooms.isEmpty) {
                 return const Center(child: CircularProgressIndicator());
               }
-              if (controller.filteredRooms.isEmpty) {
+              if (controller.rooms.isEmpty) {
                 return const Center(child: Text('Data ruang tidak ditemukan'));
               }
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.filteredRooms.length,
+                itemCount: controller.rooms.length,
                 itemBuilder: (context, index) {
-                  final room = controller.filteredRooms[index];
+                  final room = controller.rooms[index];
                   return _buildRoomCard(room, index + 1);
                 },
               );
@@ -150,11 +150,11 @@ class RuangView extends GetView<RuangController> {
               ],
             ),
             const Divider(height: 24),
-            _buildInfoRow('NAMA RUANG', room.namaRuang ?? '-', true),
+            _buildInfoRow('NAMA RUANG', room.nama ?? '-', true),
             const SizedBox(height: 12),
-            _buildInfoRow('AREA', room.namaArea ?? '-', false),
+            _buildInfoRow('AREA', room.area?.nama ?? '-', false),
             const SizedBox(height: 12),
-            _buildInfoRow('DESKRIPSI', room.deskripsi ?? '-', false),
+            _buildInfoRow('DESKRIPSI', room.des ?? '-', false),
             const SizedBox(height: 12),
             _buildInfoRow('TANGGAL DIBUAT', room.createdAt ?? '-', false),
           ],
@@ -239,7 +239,7 @@ class RuangView extends GetView<RuangController> {
                       items: controller.areas.map((area) {
                         return DropdownMenuItem<int>(
                           value: area.id,
-                          child: Text(area.namaArea ?? ''),
+                          child: Text(area.nama ?? ''),
                         );
                       }).toList(),
                       onChanged: (val) => controller.selectedAreaId.value = val,

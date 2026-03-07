@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_sop/app/data/models/user_model.dart';
 import 'package:app_sop/app/data/models/area_model.dart';
 import 'package:app_sop/app/data/models/ruang_model.dart';
+import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 
 class ApiProvider {
   // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
@@ -273,5 +274,69 @@ class ApiProvider {
       throw Exception(message);
     }
     throw Exception('Gagal memproses permintaan: ${response.statusCode}');
+  }
+
+  // --- KATEGORI SOP API ---
+  Future<List<KategoriSopModel>> getKategoriSops({String? search}) async {
+    String url = '$baseUrl/kategori-sops?per_page=100';
+    if (search != null && search.isNotEmpty) url += '&search=$search';
+
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      List dataList = [];
+      if (decoded['data'] != null) {
+        var data = decoded['data'];
+        if (data is Map) {
+          if (data['kategori_sops'] != null) {
+            dataList = data['kategori_sops'];
+          } else if (data['items'] != null) {
+            dataList = data['items'];
+          }
+        } else if (data is List) {
+          dataList = data;
+        }
+      }
+      return dataList.map((e) => KategoriSopModel.fromJson(e)).toList();
+    }
+    throw Exception('Gagal memuat kategori SOP');
+  }
+
+  Future<void> createKategoriSop(KategoriSopModel kategori) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/kategori-sops'),
+      headers: await _getHeaders(),
+      body: json.encode(kategori.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updateKategoriSop(int id, KategoriSopModel kategori) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/kategori-sops/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(kategori.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deleteKategoriSop(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/kategori-sops/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus kategori SOP');
+  }
+
+  Future<Map<String, dynamic>> getSopsByCategory(int categoryId) async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/kategori-sops/$categoryId/sops'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    }
+    throw Exception('Gagal memuat list SOP');
   }
 }

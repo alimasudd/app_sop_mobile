@@ -56,7 +56,28 @@ class HomeView extends GetView<HomeController> {
                       title: 'Users',
                       icon: Icons.people_outline,
                       items: [
-                        _buildSubMenuItem(1, Icons.person_outline, 'Manajemen User'),
+                        _buildSubMenuItem(51, Icons.vpn_key_outlined, 'Change Password'),
+                        _buildSubMenuItem(52, Icons.person_outline, 'Admin'),
+                        _buildSubMenuItem(53, Icons.security, 'Security'),
+                        _buildSubMenuItem(54, Icons.brush_outlined, 'Cleaning Service'),
+                        
+                        // Nested Staf Expansion
+                        Theme(
+                          data: Get.theme.copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            tilePadding: const EdgeInsets.only(left: 32, right: 16),
+                            leading: Icon(Icons.people_outline, size: 20, color: Colors.grey[600]),
+                            title: Text('Staf', style: TextStyle(color: Colors.grey[800], fontSize: 14, fontWeight: FontWeight.bold)),
+                            iconColor: const Color(0xFF2575FC),
+                            collapsedIconColor: Colors.grey[600],
+                            children: [
+                              _buildSubMenuItem(55, Icons.shopping_cart_outlined, 'Staf Toko', leftPadding: 48),
+                              _buildSubMenuItem(56, Icons.person_search_outlined, 'Staf HRD', leftPadding: 48),
+                            ],
+                          ),
+                        ),
+                        
+                        _buildSubMenuItem(1, Icons.people_outline, 'Semua'),
                       ],
                     ),
 
@@ -232,6 +253,13 @@ class HomeView extends GetView<HomeController> {
       case 6: return _buildPlaceholder('Laporan Saya');
       case 7: return _buildPlaceholder('Profil Saya');
       case 8: return _buildPlaceholder('Ganti Password');
+      // Sub Users Menus
+      case 51: return _buildPlaceholder('Change Password');
+      case 52: return _buildPlaceholder('Admin Users');
+      case 53: return _buildPlaceholder('Security Users');
+      case 54: return _buildPlaceholder('Cleaning Service Users');
+      case 55: return _buildPlaceholder('Staf Toko Users');
+      case 56: return _buildPlaceholder('Staf HRD Users');
       default: return const DashboardView();
     }
   }
@@ -277,6 +305,12 @@ class HomeView extends GetView<HomeController> {
       case 6: return 'Laporan Saya';
       case 7: return 'Profil Saya';
       case 8: return 'Ganti Password';
+      case 51: return 'Change Password';
+      case 52: return 'Users: Admin';
+      case 53: return 'Users: Security';
+      case 54: return 'Users: Cleaning Service';
+      case 55: return 'Users: Staf Toko';
+      case 56: return 'Users: Staf HRD';
       default: return 'Manajemen SOP';
     }
   }

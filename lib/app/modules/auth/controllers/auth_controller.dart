@@ -87,7 +87,11 @@ class AuthController extends GetxController {
               backgroundColor: Colors.orange, colorText: Colors.white);
         }
       } else {
-        Get.snackbar('Gagal', data['message'] ?? 'Login gagal',
+        String message = data['message'] ?? 'Login gagal';
+        if (data['data'] != null && data['data'] is Map) {
+          message = (data['data'] as Map).values.first[0];
+        }
+        Get.snackbar('Gagal', message,
             backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {
@@ -138,7 +142,11 @@ class AuthController extends GetxController {
             backgroundColor: Colors.green, colorText: Colors.white);
         Get.offAllNamed(Routes.LOGIN); 
       } else {
-        Get.snackbar('Gagal', data['message'] ?? 'Registrasi gagal',
+        String message = data['message'] ?? 'Registrasi gagal';
+        if (data['data'] != null && data['data'] is Map) {
+          message = (data['data'] as Map).values.first[0];
+        }
+        Get.snackbar('Gagal', message,
             backgroundColor: Colors.red, colorText: Colors.white);
       }
     } catch (e) {

@@ -112,8 +112,8 @@ class ApiProvider {
       if (response.statusCode == 422) {
         final errorData = json.decode(response.body);
         String message = errorData['message'] ?? 'Validation Error';
-        if (errorData['errors'] != null) {
-          message = (errorData['errors'] as Map).values.first[0];
+        if (errorData['data'] != null) {
+          message = (errorData['data'] as Map).values.first[0];
         }
         throw Exception(message);
       }
@@ -134,8 +134,8 @@ class ApiProvider {
       if (response.statusCode == 422) {
         final errorData = json.decode(response.body);
         String message = errorData['message'] ?? 'Validation Error';
-        if (errorData['errors'] != null) {
-          message = (errorData['errors'] as Map).values.first[0];
+        if (errorData['data'] != null) {
+          message = (errorData['data'] as Map).values.first[0];
         }
         throw Exception(message);
       }

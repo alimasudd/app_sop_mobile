@@ -18,8 +18,10 @@ class UsersController extends GetxController {
   final emailController = TextEditingController();
   final hpController = TextEditingController();
   final passwordController = TextEditingController();
-  var selectedLevelId = 2.obs; // Default level
-  var selectedStatusAktif = 1.obs; // Default status
+  final jabatanController = TextEditingController();
+  
+  var selectedLevelId = Rxn<int>(); // Nullable for "-- Pilih Level --"
+  var selectedStatusAktif = 1.obs; // Default status (Aktif)
 
   @override
   void onInit() {
@@ -58,15 +60,17 @@ class UsersController extends GetxController {
       namaController.text = user.nama ?? '';
       emailController.text = user.email ?? '';
       hpController.text = user.hp ?? '';
+      jabatanController.text = user.jabatan ?? '';
       passwordController.text = ''; // Leave blank on edit
-      selectedLevelId.value = user.levelId ?? 2;
+      selectedLevelId.value = user.levelId;
       selectedStatusAktif.value = user.statusAktif ?? 1;
     } else {
       namaController.clear();
       emailController.clear();
       hpController.clear();
+      jabatanController.clear();
       passwordController.clear();
-      selectedLevelId.value = 2;
+      selectedLevelId.value = null;
       selectedStatusAktif.value = 1;
     }
   }
@@ -75,42 +79,48 @@ class UsersController extends GetxController {
     if (namaController.text.isEmpty || emailController.text.isEmpty) {
       Get.snackbar('Error', 'Nama dan Email wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
-      debugPrint('Validation Error: Name or Email is empty');
       return;
     }
 
+    if (id == null && passwordController.text.isEmpty) {
+      Get.snackbar('Error', 'Password wajib diisi untuk user baru',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      return;
+    }
+
+    FocusManager.instance.primaryFocus?.unfocus();
     isLoading.value = true;
     try {
       final user = UserModel(
         nama: namaController.text,
         email: emailController.text,
         hp: hpController.text,
-        levelId: selectedLevelId.value,
+        jabatan: jabatanController.text,
+        password: passwordController.text.isNotEmpty ? passwordController.text : null,
+        levelId: selectedLevelId.value ?? 2,
         statusAktif: selectedStatusAktif.value,
       );
 
       if (id == null) {
-        // Create
         await _apiProvider.createUser(user);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        Get.back(); 
         Get.snackbar('Sukses', 'User berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
-        debugPrint('Create User Success');
       } else {
-        // Update
         await _apiProvider.updateUser(id, user);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        Get.back(); 
         Get.snackbar('Sukses', 'User berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
-        debugPrint('Update User Success for ID: $id');
       }
       
-      // Refresh list
       fetchUsers();
-      
-      // Close form
-      FocusManager.instance.primaryFocus?.unfocus();
-      Get.back(); 
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menyimpan data: $e',
+      String errorMessage = e.toString().replaceAll('Exception: ', '');
+      Get.snackbar('Gagal', errorMessage,
           backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Save User Error: $e');
     } finally {
@@ -119,29 +129,43 @@ class UsersController extends GetxController {
   }
 
   void deleteUser(int id) async {
-    Get.defaultDialog(
-      title: 'Delete User',
-      middleText: 'Are you sure you want to delete this user?',
-      textConfirm: 'Delete',
-      textCancel: 'Cancel',
-      confirmTextColor: Colors.white,
-      onConfirm: () async {
-        Get.back();
-        isLoading.value = true;
-        try {
-          await _apiProvider.deleteUser(id);
-          Get.snackbar('Sukses', 'User berhasil dihapus',
-              backgroundColor: Colors.green, colorText: Colors.white);
-          debugPrint('Delete User Success for ID: $id');
-          fetchUsers();
-        } catch (e) {
-          Get.snackbar('Error', 'Gagal menghapus user: $e',
-              backgroundColor: Colors.red, colorText: Colors.white);
-          debugPrint('Delete User Error: $e');
-        } finally {
-          isLoading.value = false;
-        }
-      },
+    Get.dialog(
+      AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: const Text('Hapus User', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.'),
+        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Get.back();
+              isLoading.value = true;
+              try {
+                await _apiProvider.deleteUser(id);
+                Get.snackbar('Sukses', 'User berhasil dihapus',
+                    backgroundColor: Colors.green, colorText: Colors.white);
+                fetchUsers();
+              } catch (e) {
+                Get.snackbar('Error', 'Gagal menghapus user: $e',
+                    backgroundColor: Colors.red, colorText: Colors.white);
+              } finally {
+                isLoading.value = false;
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Hapus'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -151,6 +175,7 @@ class UsersController extends GetxController {
     namaController.dispose();
     emailController.dispose();
     hpController.dispose();
+    jabatanController.dispose();
     passwordController.dispose();
     super.onClose();
   }

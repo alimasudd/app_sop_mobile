@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/area_model.dart';
+import 'package:app_sop/app/data/providers/api_provider.dart';
 
 class AreaController extends GetxController {
+  final ApiProvider _apiProvider = ApiProvider();
   var areas = <AreaModel>[].obs;
-  var filteredAreas = <AreaModel>[].obs;
   var isLoading = false.obs;
 
   // Search
@@ -20,43 +21,37 @@ class AreaController extends GetxController {
     fetchAreas();
   }
 
-  void fetchAreas() {
+  Future<void> fetchAreas({String? query}) async {
     isLoading.value = true;
-    // Dummy data based on screenshot
-    var dummyData = [
-      AreaModel(id: 1, namaArea: 'HO', deskripsi: 'HO'),
-      AreaModel(id: 2, namaArea: 'Pabrik Garam Sulawesi', deskripsi: ''),
-      AreaModel(id: 3, namaArea: 'Kantor PKBM ISESW', deskripsi: 'Area kantor PKBM ISESW'),
-      AreaModel(id: 4, namaArea: 'Kantor PKBM Isesw', deskripsi: ''),
-    ];
-    
-    areas.assignAll(dummyData);
-    filteredAreas.assignAll(dummyData);
-    isLoading.value = false;
+    try {
+      final data = await _apiProvider.getAreas(search: query);
+      areas.assignAll(data);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memuat area: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Fetch Areas Error: $e');
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   void searchArea(String query) {
-    if (query.isEmpty) {
-      filteredAreas.assignAll(areas);
-    } else {
-      filteredAreas.assignAll(areas.where((area) {
-        return (area.namaArea?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-               (area.deskripsi?.toLowerCase().contains(query.toLowerCase()) ?? false);
-      }).toList());
-    }
+    // Basic debounce could be added here, but for now just call fetch
+    fetchAreas(query: query);
   }
 
   void setupForm([AreaModel? area]) {
     if (area != null) {
-      namaAreaController.text = area.namaArea ?? '';
-      deskripsiController.text = area.deskripsi ?? '';
+      namaAreaController.text = area.nama ?? '';
+      deskripsiController.text = area.des ?? '';
     } else {
       namaAreaController.clear();
       deskripsiController.clear();
     }
   }
 
-  void saveArea([int? id]) {
+  Future<void> saveArea([int? id]) async {
+    debugPrint('saveArea called with id: $id');
     if (namaAreaController.text.isEmpty) {
       Get.snackbar('Error', 'Nama Area wajib diisi',
           backgroundColor: Colors.red, colorText: Colors.white);
@@ -64,36 +59,35 @@ class AreaController extends GetxController {
     }
 
     isLoading.value = true;
-    
-    // Simulate API call delay
-    Future.delayed(const Duration(milliseconds: 500), () {
+    try {
+      final areaData = AreaModel(
+        nama: namaAreaController.text,
+        des: deskripsiController.text,
+      );
+
       if (id == null) {
-        // Add new (dummy)
-        final newArea = AreaModel(
-          id: areas.length + 1,
-          namaArea: namaAreaController.text,
-          deskripsi: deskripsiController.text,
-        );
-        areas.add(newArea);
-        Get.back();
+        await _apiProvider.createArea(areaData);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (Get.isDialogOpen ?? false) Get.back();
         Get.snackbar('Sukses', 'Area berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
-        // Edit existing (dummy)
-        int index = areas.indexWhere((element) => element.id == id);
-        if (index != -1) {
-          areas[index].namaArea = namaAreaController.text;
-          areas[index].deskripsi = deskripsiController.text;
-          areas.refresh();
-        }
-        Get.back();
+        await _apiProvider.updateArea(id, areaData);
+        FocusManager.instance.primaryFocus?.unfocus();
+        await Future.delayed(const Duration(milliseconds: 100));
+        if (Get.isDialogOpen ?? false) Get.back();
         Get.snackbar('Sukses', 'Area berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
       }
-      
-      searchArea(searchController.text);
+      fetchAreas(query: searchController.text);
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal menyimpan area: $e',
+          backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Save Area Error: $e');
+    } finally {
       isLoading.value = false;
-    });
+    }
   }
 
   void deleteArea(int id) {
@@ -105,12 +99,21 @@ class AreaController extends GetxController {
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
           ElevatedButton(
-            onPressed: () {
-              areas.removeWhere((element) => element.id == id);
-              searchArea(searchController.text);
+            onPressed: () async {
               Get.back();
-              Get.snackbar('Sukses', 'Area berhasil dihapus',
-                  backgroundColor: Colors.green, colorText: Colors.white);
+              isLoading.value = true;
+              try {
+                await _apiProvider.deleteArea(id);
+                Get.snackbar('Sukses', 'Area berhasil dihapus',
+                    backgroundColor: Colors.green, colorText: Colors.white);
+                fetchAreas(query: searchController.text);
+              } catch (e) {
+                Get.snackbar('Error', 'Gagal menghapus area: $e',
+                    backgroundColor: Colors.red, colorText: Colors.white);
+                debugPrint('Delete Area Error: $e');
+              } finally {
+                isLoading.value = false;
+              }
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
             child: const Text('Hapus'),
@@ -122,9 +125,6 @@ class AreaController extends GetxController {
 
   @override
   void onClose() {
-    searchController.dispose();
-    namaAreaController.dispose();
-    deskripsiController.dispose();
     super.onClose();
   }
 }

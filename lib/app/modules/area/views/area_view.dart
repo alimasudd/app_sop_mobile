@@ -24,15 +24,15 @@ class AreaView extends GetView<AreaController> {
                 return const Center(child: CircularProgressIndicator());
               }
               
-              if (controller.filteredAreas.isEmpty) {
+              if (controller.areas.isEmpty) {
                 return const Center(child: Text('Data area tidak ditemukan'));
               }
 
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.filteredAreas.length,
+                itemCount: controller.areas.length,
                 itemBuilder: (context, index) {
-                  final area = controller.filteredAreas[index];
+                  final area = controller.areas[index];
                   return _buildAreaCard(area, index + 1);
                 },
               );
@@ -164,14 +164,14 @@ class AreaView extends GetView<AreaController> {
             const Text('NAMA AREA', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Text(
-              area.namaArea ?? '-',
+              area.nama ?? '-',
               style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
             ),
             const SizedBox(height: 12),
             const Text('DESKRIPSI', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
             Text(
-              (area.deskripsi == null || area.deskripsi!.isEmpty) ? '-' : area.deskripsi!,
+              (area.des == null || area.des!.isEmpty) ? '-' : area.des!,
               style: const TextStyle(fontSize: 14, color: Color(0xFF6C757D)),
             ),
           ],

@@ -1,25 +1,25 @@
 class AreaModel {
   int? id;
-  String? namaArea;
-  String? deskripsi;
+  String? nama;
+  String? des;
 
   AreaModel({
     this.id,
-    this.namaArea,
-    this.deskripsi,
+    this.nama,
+    this.des,
   });
 
   AreaModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    namaArea = json['nama_area'];
-    deskripsi = json['deskripsi'];
+    nama = json['nama'];
+    des = json['des'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (id != null) data['id'] = id;
-    data['nama_area'] = namaArea;
-    data['deskripsi'] = deskripsi;
+    data['nama'] = nama;
+    data['des'] = des;
     return data;
   }
 }

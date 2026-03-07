@@ -4,6 +4,10 @@ import '../modules/auth/views/login_view.dart';
 import '../modules/auth/views/register_view.dart';
 import '../modules/users/bindings/users_binding.dart';
 import '../modules/users/views/users_view.dart';
+import '../modules/area/bindings/area_binding.dart';
+import '../modules/area/views/area_view.dart';
+import '../modules/ruang/bindings/ruang_binding.dart';
+import '../modules/ruang/views/ruang_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 
@@ -34,6 +38,16 @@ class AppPages {
       name: _Paths.USERS,
       page: () => const UsersView(),
       binding: UsersBinding(),
+    ),
+    GetPage(
+      name: _Paths.AREA,
+      page: () => const AreaView(),
+      binding: AreaBinding(),
+    ),
+    GetPage(
+      name: _Paths.RUANG,
+      page: () => const RuangView(),
+      binding: RuangBinding(),
     ),
   ];
 }

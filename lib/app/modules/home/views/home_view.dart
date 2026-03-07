@@ -5,6 +5,10 @@ import 'package:app_sop/app/modules/home/views/dashboard_view.dart';
 import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
 import 'package:app_sop/app/modules/users/views/users_view.dart';
 import 'package:app_sop/app/modules/users/bindings/users_binding.dart';
+import 'package:app_sop/app/modules/area/views/area_view.dart';
+import 'package:app_sop/app/modules/area/bindings/area_binding.dart';
+import 'package:app_sop/app/modules/ruang/views/ruang_view.dart';
+import 'package:app_sop/app/modules/ruang/bindings/ruang_binding.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
@@ -16,6 +20,12 @@ class HomeView extends GetView<HomeController> {
     // basic layout, we can lazyPut it here or ensure it's in the binding.
     if (!Get.isRegistered<UsersBinding>()) {
       UsersBinding().dependencies(); 
+    }
+    if (!Get.isRegistered<AreaBinding>()) {
+      AreaBinding().dependencies(); 
+    }
+    if (!Get.isRegistered<RuangBinding>()) {
+      RuangBinding().dependencies(); 
     }
 
     return Scaffold(
@@ -236,10 +246,10 @@ class HomeView extends GetView<HomeController> {
     switch (index) {
       case 0: return const DashboardView();
       case 1: return const UsersView();
+      case 101: return const AreaView();
+      case 11: return const RuangView();
       case 2: return _buildPlaceholder('Pengawas SOP Harian');
       case 3: return _buildPlaceholder('Monitor Tugas');
-      case 101: return _buildPlaceholder('Master: Area');
-      case 11: return _buildPlaceholder('Master: Ruang');
       case 12: return _buildPlaceholder('Master: Kategori SOP');
       case 13: return _buildPlaceholder('Master: SOP');
       case 14: return _buildPlaceholder('Master: Langkah SOP');
@@ -289,10 +299,10 @@ class HomeView extends GetView<HomeController> {
     switch (index) {
       case 0: return 'Dashboard';
       case 1: return 'Manajemen User';
+      case 101: return 'Manajemen Area';
+      case 11: return 'Manajemen Ruang';
       case 2: return 'Pengawas SOP Harian';
       case 3: return 'Monitor Tugas';
-      case 101: return 'Master: Area';
-      case 11: return 'Master: Ruang';
       case 12: return 'Master: Kategori SOP';
       case 13: return 'Master: SOP';
       case 14: return 'Master: Langkah SOP';

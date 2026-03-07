@@ -38,16 +38,23 @@ class HomeController extends GetxController {
   void _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('user_email');
-    if (email != null && email.isNotEmpty) {
+    String? name = prefs.getString('user_name');
+    int? levelId = prefs.getInt('level_id');
+    
+    if (email != null) {
       userEmail.value = email;
-      // Simple logic for role demo: if contains 'karyawan', set as employee
-      if (email.contains('karyawan')) {
-        isAdmin.value = false;
-        userName.value = 'Karyawan Test SOP';
-      } else {
-        isAdmin.value = true;
-        userName.value = 'haris';
-      }
+    }
+    
+    if (name != null) {
+      userName.value = name;
+    }
+
+    // Role detection: 1 = Admin, others (like 2) = Non-Admin/Staff
+    if (levelId != null) {
+      isAdmin.value = (levelId == 1);
+    } else {
+      // Fallback for safety - checking email if level_id is missing
+      isAdmin.value = !(email?.contains('karyawan') ?? false);
     }
   }
 
@@ -79,6 +86,8 @@ class HomeController extends GetxController {
               final prefs = await SharedPreferences.getInstance();
               await prefs.remove('token');
               await prefs.remove('user_email');
+              await prefs.remove('user_name');
+              await prefs.remove('level_id');
               Get.offAllNamed(Routes.LOGIN);
             },
             style: ElevatedButton.styleFrom(

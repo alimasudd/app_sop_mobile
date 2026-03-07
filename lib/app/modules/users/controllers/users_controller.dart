@@ -29,10 +29,10 @@ class UsersController extends GetxController {
     fetchUsers();
   }
 
-  void fetchUsers() async {
+  void fetchUsers({String? query}) async {
     isLoading.value = true;
     try {
-      final data = await _apiProvider.getUsers();
+      final data = await _apiProvider.getUsers(search: query);
       users.assignAll(data);
       filteredUsers.assignAll(data);
     } catch (e) {
@@ -45,14 +45,8 @@ class UsersController extends GetxController {
   }
 
   void searchUser(String query) {
-    if (query.isEmpty) {
-      filteredUsers.assignAll(users);
-    } else {
-      filteredUsers.assignAll(users.where((user) {
-        return (user.nama?.toLowerCase().contains(query.toLowerCase()) ?? false) ||
-               (user.email?.toLowerCase().contains(query.toLowerCase()) ?? false);
-      }).toList());
-    }
+    // Calling API for server-side search (matching PHP index method)
+    fetchUsers(query: query);
   }
 
   void setupForm([UserModel? user]) {
@@ -97,7 +91,7 @@ class UsersController extends GetxController {
         hp: hpController.text,
         jabatan: jabatanController.text,
         password: passwordController.text.isNotEmpty ? passwordController.text : null,
-        levelId: selectedLevelId.value ?? 2,
+        levelId: selectedLevelId.value ?? 5, // Default to 5 (Staff) as per PHP store method
         statusAktif: selectedStatusAktif.value,
       );
 

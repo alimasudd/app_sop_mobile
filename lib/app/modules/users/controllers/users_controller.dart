@@ -147,6 +147,7 @@ class UsersController extends GetxController {
               } catch (e) {
                 Get.snackbar('Error', 'Gagal menghapus user: $e',
                     backgroundColor: Colors.red, colorText: Colors.white);
+                debugPrint('Delete User Error: $e');
               } finally {
                 isLoading.value = false;
               }
@@ -165,12 +166,6 @@ class UsersController extends GetxController {
 
   @override
   void onClose() {
-    searchController.dispose();
-    namaController.dispose();
-    emailController.dispose();
-    hpController.dispose();
-    jabatanController.dispose();
-    passwordController.dispose();
     super.onClose();
   }
 }

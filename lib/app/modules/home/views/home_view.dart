@@ -41,60 +41,64 @@ class HomeView extends GetView<HomeController> {
         children: [
           _buildDrawerHeader(),
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildMenuItem(0, Icons.dashboard_outlined, 'Dashboard'),
-                _buildMenuItem(1, Icons.people_outline, 'Manajemen User'),
-                
-                // Master Data Sub-menu
-                _buildExpansionMenu(
-                  title: 'Master Data',
-                  icon: Icons.storage,
-                  items: [
-                    // Nested Area (Level 3)
-                    Theme(
-                      data: Get.theme.copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        tilePadding: const EdgeInsets.only(left: 32, right: 16),
-                        leading: Icon(Icons.map_outlined, size: 20, color: Colors.grey[600]),
-                        title: Text('Area', style: TextStyle(color: Colors.grey[800], fontSize: 14)),
-                        iconColor: const Color(0xFF2575FC),
-                        collapsedIconColor: Colors.grey[600],
-                        children: [
-                          _buildSubMenuItem(101, Icons.list_alt_outlined, 'Daftar Area', leftPadding: 48),
-                          _buildSubMenuItem(102, Icons.category_outlined, 'Tipe Area', leftPadding: 48),
-                        ],
-                      ),
+            child: Obx(() {
+              final isAdmin = controller.isAdmin.value;
+              return ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildMenuItem(0, Icons.dashboard_outlined, 'Dashboard'),
+                  
+                  if (isAdmin) ...[
+                    _buildMenuItem(2, Icons.visibility_outlined, 'Pengawas SOP Harian'),
+                    _buildMenuItem(3, Icons.query_stats_outlined, 'Monitor Tugas'),
+                    
+                    _buildExpansionMenu(
+                      title: 'Users',
+                      icon: Icons.people_outline,
+                      items: [
+                        _buildSubMenuItem(1, Icons.person_outline, 'Manajemen User'),
+                      ],
                     ),
-                    _buildSubMenuItem(11, Icons.business_outlined, 'Ruang'),
-                    _buildSubMenuItem(12, Icons.folder_outlined, 'Kategori SOP'),
-                    _buildSubMenuItem(13, Icons.description_outlined, 'SOP'),
-                    _buildSubMenuItem(14, Icons.format_list_numbered_outlined, 'Langkah SOP'),
-                    _buildSubMenuItem(15, Icons.person_add_outlined, 'Tugas SOP'),
-                    _buildSubMenuItem(16, Icons.check_box_outlined, 'Pelaksanaan SOP'),
-                  ],
-                ),
 
-                // Report Sub-menu
-                _buildExpansionMenu(
-                  title: 'Report',
-                  icon: Icons.article_outlined,
-                  items: [
-                    _buildSubMenuItem(20, Icons.bar_chart_outlined, 'Laporan SOP'),
-                    _buildSubMenuItem(21, Icons.group_outlined, 'Laporan Karyawan'),
-                  ],
-                ),
+                    _buildExpansionMenu(
+                      title: 'Master Data',
+                      icon: Icons.storage,
+                      items: [
+                        _buildSubMenuItem(101, Icons.map_outlined, 'Area'),
+                        _buildSubMenuItem(11, Icons.business_outlined, 'Ruang'),
+                        _buildSubMenuItem(12, Icons.folder_outlined, 'Kategori SOP'),
+                        _buildSubMenuItem(13, Icons.description_outlined, 'SOP'),
+                        _buildSubMenuItem(14, Icons.format_list_numbered_outlined, 'Langkah SOP'),
+                        _buildSubMenuItem(15, Icons.person_add_outlined, 'Tugas SOP'),
+                        _buildSubMenuItem(16, Icons.check_box_outlined, 'Pelaksanaan SOP'),
+                      ],
+                    ),
 
-                _buildMenuItem(4, Icons.settings_outlined, 'Setting'),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.logout, color: Colors.red),
-                  title: const Text('Keluar', style: TextStyle(color: Colors.red)),
-                  onTap: () => controller.logout(),
-                ),
-              ],
-            ),
+                    _buildExpansionMenu(
+                      title: 'Report',
+                      icon: Icons.article_outlined,
+                      items: [
+                        _buildSubMenuItem(20, Icons.bar_chart_outlined, 'Laporan SOP'),
+                        _buildSubMenuItem(21, Icons.group_outlined, 'Laporan Karyawan'),
+                      ],
+                    ),
+                    _buildMenuItem(4, Icons.settings_outlined, 'Setting'),
+                  ] else ...[
+                    _buildMenuItem(5, Icons.assignment_outlined, 'Tugas Saya', badge: '1'),
+                    _buildMenuItem(6, Icons.book_outlined, 'Laporan Saya'),
+                    _buildMenuItem(7, Icons.account_box_outlined, 'Profil Saya'),
+                    _buildMenuItem(8, Icons.vpn_key_outlined, 'Ganti Password'),
+                  ],
+
+                  const Divider(),
+                  ListTile(
+                    leading: const Icon(Icons.logout, color: Colors.red),
+                    title: const Text('Keluar', style: TextStyle(color: Colors.red)),
+                    onTap: () => controller.logout(),
+                  ),
+                ],
+              );
+            }),
           ),
         ],
       ),
@@ -156,10 +160,10 @@ class HomeView extends GetView<HomeController> {
             child: Icon(Icons.admin_panel_settings, size: 40, color: Colors.white),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Panel Admin',
-            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-          ),
+          Obx(() => Text(
+            controller.userName.value,
+            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          )),
           Obx(() => Text(
             controller.userEmail.value,
             style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
@@ -169,7 +173,7 @@ class HomeView extends GetView<HomeController> {
     );
   }
 
-  Widget _buildMenuItem(int index, IconData icon, String title) {
+  Widget _buildMenuItem(int index, IconData icon, String title, {String? badge}) {
     return Obx(() {
       final isSelected = controller.selectedIndex.value == index;
       return ListTile(
@@ -184,6 +188,19 @@ class HomeView extends GetView<HomeController> {
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
+        trailing: badge != null
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  badge,
+                  style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+              )
+            : null,
         selected: isSelected,
         selectedTileColor: const Color(0xFF2575FC).withOpacity(0.1),
         onTap: () {
@@ -198,18 +215,24 @@ class HomeView extends GetView<HomeController> {
     switch (index) {
       case 0: return const DashboardView();
       case 1: return const UsersView();
-      case 101: return _buildPlaceholder('Master: Daftar Area');
-      case 102: return _buildPlaceholder('Master: Tipe Area');
-      case 11: return _buildPlaceholder('Data Master: Ruang');
-      case 12: return _buildPlaceholder('Data Master: Kategori SOP');
-      case 13: return _buildPlaceholder('Data Master: SOP');
-      case 14: return _buildPlaceholder('Data Master: Langkah SOP');
-      case 15: return _buildPlaceholder('Data Master: Tugas SOP');
-      case 16: return _buildPlaceholder('Data Master: Pelaksanaan SOP');
+      case 2: return _buildPlaceholder('Pengawas SOP Harian');
+      case 3: return _buildPlaceholder('Monitor Tugas');
+      case 101: return _buildPlaceholder('Master: Area');
+      case 11: return _buildPlaceholder('Master: Ruang');
+      case 12: return _buildPlaceholder('Master: Kategori SOP');
+      case 13: return _buildPlaceholder('Master: SOP');
+      case 14: return _buildPlaceholder('Master: Langkah SOP');
+      case 15: return _buildPlaceholder('Master: Tugas SOP');
+      case 16: return _buildPlaceholder('Master: Pelaksanaan SOP');
       case 20: return _buildPlaceholder('Laporan SOP');
       case 21: return _buildPlaceholder('Laporan Karyawan');
-      case 4: return _buildPlaceholder('Pengaturan Sistem');
-      default: return _buildPlaceholder('Halaman Baru Sedang Disiapkan');
+      case 4: return _buildPlaceholder('Pengaturan');
+      // Karyawan Menus
+      case 5: return _buildPlaceholder('Tugas Saya');
+      case 6: return _buildPlaceholder('Laporan Saya');
+      case 7: return _buildPlaceholder('Profil Saya');
+      case 8: return _buildPlaceholder('Ganti Password');
+      default: return const DashboardView();
     }
   }
 
@@ -238,8 +261,9 @@ class HomeView extends GetView<HomeController> {
     switch (index) {
       case 0: return 'Dashboard';
       case 1: return 'Manajemen User';
-      case 101: return 'Master: Daftar Area';
-      case 102: return 'Master: Tipe Area';
+      case 2: return 'Pengawas SOP Harian';
+      case 3: return 'Monitor Tugas';
+      case 101: return 'Master: Area';
       case 11: return 'Master: Ruang';
       case 12: return 'Master: Kategori SOP';
       case 13: return 'Master: SOP';
@@ -249,7 +273,11 @@ class HomeView extends GetView<HomeController> {
       case 20: return 'Laporan SOP';
       case 21: return 'Laporan Karyawan';
       case 4: return 'Pengaturan';
-      default: return 'Panel Admin';
+      case 5: return 'Tugas Saya';
+      case 6: return 'Laporan Saya';
+      case 7: return 'Profil Saya';
+      case 8: return 'Ganti Password';
+      default: return 'Manajemen SOP';
     }
   }
 }

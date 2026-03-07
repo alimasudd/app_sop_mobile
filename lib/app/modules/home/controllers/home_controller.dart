@@ -7,6 +7,8 @@ class HomeController extends GetxController {
   final selectedIndex = 0.obs;
   final userEmail = 'admin@maret.com'.obs;
   final userName = 'haris'.obs;
+  final isAdmin = true.obs; 
+
 
   // Dummy Dashboard Stats
   final totalSop = 12.obs;
@@ -30,14 +32,22 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    _loadUserEmail();
+    _loadUserInfo();
   }
 
-  void _loadUserEmail() async {
+  void _loadUserInfo() async {
     final prefs = await SharedPreferences.getInstance();
     String? email = prefs.getString('user_email');
     if (email != null && email.isNotEmpty) {
       userEmail.value = email;
+      // Simple logic for role demo: if contains 'karyawan', set as employee
+      if (email.contains('karyawan')) {
+        isAdmin.value = false;
+        userName.value = 'Karyawan Test SOP';
+      } else {
+        isAdmin.value = true;
+        userName.value = 'haris';
+      }
     }
   }
 

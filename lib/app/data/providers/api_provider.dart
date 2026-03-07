@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:test_maret/app/data/models/user_model.dart';
 
 class ApiProvider {
-  final String baseUrl = "https://cekdemo.com/ap/testmaret/public/api";
+  final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
 
   // Health Check
   Future<http.Response> checkHealth() async {

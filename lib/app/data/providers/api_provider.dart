@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_sop/app/data/models/user_model.dart';
+import 'package:app_sop/app/data/models/area_model.dart';
+import 'package:app_sop/app/data/models/ruang_model.dart';
 
 class ApiProvider {
-  final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
+  // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
+  final String baseUrl = "http://192.168.1.5:80/api";
 
   // Health Check
   Future<http.Response> checkHealth() async {
@@ -151,5 +154,124 @@ class ApiProvider {
     );
 
     return response.statusCode == 200 || response.statusCode == 204;
+  }
+
+  // --- AREA API ---
+  Future<List<AreaModel>> getAreas({String? search}) async {
+    String url = '$baseUrl/areas?per_page=100';
+    if (search != null && search.isNotEmpty) url += '&search=$search';
+
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      List dataList = [];
+      if (decoded['data'] != null) {
+        var data = decoded['data'];
+        if (data is Map) {
+          if (data['areas'] != null) {
+            dataList = data['areas'];
+          } else if (data['items'] != null) {
+            dataList = data['items'];
+          }
+        } else if (data is List) {
+          dataList = data;
+        }
+      }
+      return dataList.map((e) => AreaModel.fromJson(e)).toList();
+    }
+    throw Exception('Gagal memuat area');
+  }
+
+  Future<void> createArea(AreaModel area) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/areas'),
+      headers: await _getHeaders(),
+      body: json.encode(area.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updateArea(int id, AreaModel area) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/areas/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(area.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deleteArea(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/areas/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus area');
+  }
+
+  // --- RUANG API ---
+  Future<List<RuangModel>> getRuangs({String? search}) async {
+    String url = '$baseUrl/ruangs?per_page=100';
+    if (search != null && search.isNotEmpty) url += '&search=$search';
+
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      List dataList = [];
+      if (decoded['data'] != null) {
+        var data = decoded['data'];
+        if (data is Map) {
+          if (data['ruangs'] != null) {
+            dataList = data['ruangs'];
+          } else if (data['items'] != null) {
+            dataList = data['items'];
+          }
+        } else if (data is List) {
+          dataList = data;
+        }
+      }
+      return dataList.map((e) => RuangModel.fromJson(e)).toList();
+    }
+    throw Exception('Gagal memuat ruang');
+  }
+
+  Future<void> createRuang(RuangModel ruang) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/ruangs'),
+      headers: await _getHeaders(),
+      body: json.encode(ruang.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updateRuang(int id, RuangModel ruang) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/ruangs/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(ruang.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deleteRuang(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/ruangs/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus ruang');
+  }
+
+  // Common Error Handler
+  void _handleError(http.Response response) {
+    if (response.statusCode == 422) {
+      final errorData = json.decode(response.body);
+      String message = errorData['message'] ?? 'Validation Error';
+      if (errorData['data'] != null && errorData['data'] is Map) {
+        message = (errorData['data'] as Map).values.first[0];
+      }
+      throw Exception(message);
+    }
+    throw Exception('Gagal memproses permintaan: ${response.statusCode}');
   }
 }

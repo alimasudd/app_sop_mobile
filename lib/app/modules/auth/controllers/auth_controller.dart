@@ -93,6 +93,7 @@ class AuthController extends GetxController {
         }
         Get.snackbar('Gagal', message,
             backgroundColor: Colors.red, colorText: Colors.white);
+        debugPrint('Login Response Error: $message');
       }
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
@@ -148,6 +149,7 @@ class AuthController extends GetxController {
         }
         Get.snackbar('Gagal', message,
             backgroundColor: Colors.red, colorText: Colors.white);
+        debugPrint('Register Response Error: $message');
       }
     } catch (e) {
       Get.snackbar('Error', 'Terjadi kesalahan: $e',
@@ -169,10 +171,12 @@ class AuthController extends GetxController {
       } else {
         Get.snackbar('Gagal', 'Server terdeteksi tapi error: ${response.statusCode}',
             backgroundColor: Colors.orange, colorText: Colors.white);
+        debugPrint('Health Check Failure: ${response.statusCode}');
       }
     } catch (e) {
       Get.snackbar('Error', 'Gagal menghubungi API: $e',
           backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint('Health Check Catch Error: $e');
     } finally {
       isLoading.value = false;
     }
@@ -195,13 +199,6 @@ class AuthController extends GetxController {
 
   @override
   void onClose() {
-    loginEmailController.dispose();
-    loginPasswordController.dispose();
-    regNikController.dispose();
-    regNamaController.dispose();
-    regEmailController.dispose();
-    regPasswordController.dispose();
-    regHpController.dispose();
     super.onClose();
   }
 }

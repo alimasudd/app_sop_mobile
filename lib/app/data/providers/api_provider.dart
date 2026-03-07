@@ -24,8 +24,21 @@ class ApiProvider {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
-    };
+  };
   }
+
+  // Profile
+  Future<http.Response> getProfile(String token) async {
+    return await http.get(
+      Uri.parse("$baseUrl/profile"),
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+  }
+
 
   // Login
   Future<http.Response> login(String email, String password) async {
@@ -50,10 +63,15 @@ class ApiProvider {
     return response;
   }
 
-  // Get Users
-  Future<List<UserModel>> getUsers() async {
+  // Get Users with search support
+  Future<List<UserModel>> getUsers({String? search}) async {
+    String url = '$baseUrl/users?per_page=100'; // Request more data
+    if (search != null && search.isNotEmpty) {
+      url += '&search=$search';
+    }
+
     final response = await http.get(
-      Uri.parse('$baseUrl/users'),
+      Uri.parse(url),
       headers: await _getHeaders(),
     );
 
@@ -62,29 +80,16 @@ class ApiProvider {
       debugPrint('Get Users Response: ${response.body}');
       
       List dataList = [];
-      if (decoded is List) {
-        dataList = decoded;
-      } else if (decoded is Map) {
-        // Handle {"data": {"users": [...]}}
-        if (decoded.containsKey('data')) {
-          var dataContent = decoded['data'];
-          if (dataContent is List) {
-            dataList = dataContent;
-          } else if (dataContent is Map && dataContent.containsKey('users')) {
-            dataList = dataContent['users'];
-          } else if (dataContent is Map) {
-             dataList = [dataContent];
-          }
-        } 
-        // Handle {"users": [...]}
-        else if (decoded.containsKey('users')) {
-          dataList = decoded['users'];
+      // Matching standard Laravel API structure: { "success": true, "data": { "users": [...] } }
+      if (decoded is Map && decoded.containsKey('data')) {
+        var dataSection = decoded['data'];
+        if (dataSection is Map && dataSection.containsKey('users')) {
+          dataList = dataSection['users'];
+        } else if (dataSection is List) {
+          dataList = dataSection;
         }
-      }
-
-      if (dataList.isEmpty && response.body.contains('"users":[')) {
-         // Fallback manual search if logic above missed it
-         throw Exception('Gagal memproses struktur JSON. Gunakan Map manual.');
+      } else if (decoded is List) {
+        dataList = decoded;
       }
       
       return dataList.map((e) => UserModel.fromJson(e)).toList();

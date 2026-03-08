@@ -341,7 +341,7 @@ class KategoriSopView extends GetView<KategoriSopController> {
                         ),
                       ],
                     ),
-                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                    IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close)),
                   ],
                 ),
                 const Divider(),
@@ -382,19 +382,21 @@ class KategoriSopView extends GetView<KategoriSopController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
+                    TextButton(onPressed: () => Get.back(closeOverlays: true), child: const Text('Batal')),
                     const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () => controller.saveKategori(item?.id),
-                      icon: const Icon(Icons.save, size: 18),
-                      label: Text(item == null ? 'SIMPAN' : 'Update'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: item == null ? const Color(0xFF1B4EAA) : Colors.orange,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
+                Obx(() => ElevatedButton.icon(
+                  onPressed: controller.isSaving.value ? null : () => controller.saveKategori(item?.id),
+                  icon: controller.isSaving.value 
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      : const Icon(Icons.save, size: 18),
+                  label: Text(controller.isSaving.value ? 'Loading...' : (item == null ? 'SIMPAN' : 'Update')),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: item == null ? const Color(0xFF1B4EAA) : Colors.orange,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                )),
                   ],
                 ),
               ],
@@ -424,7 +426,7 @@ class KategoriSopView extends GetView<KategoriSopController> {
                     'Daftar SOP - ${controller.selectedKategoriName.value}',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   )),
-                  IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                  IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close)),
                 ],
               ),
               const Divider(),
@@ -477,11 +479,11 @@ class KategoriSopView extends GetView<KategoriSopController> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton(onPressed: () => Get.back(), child: const Text('Tutup')),
+                  TextButton(onPressed: () => Get.back(closeOverlays: true), child: const Text('Tutup')),
                   const SizedBox(width: 10),
                   ElevatedButton.icon(
                     onPressed: () {
-                        Get.back(); // Close dialog first
+                        Get.back(closeOverlays: true); // Close dialog first
                         try {
                           if (Get.isRegistered<HomeController>()) {
                             Get.find<HomeController>().changeIndex(13);

@@ -9,6 +9,7 @@ class KategoriSopController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   var kategoriSops = <KategoriSopModel>[].obs;
   var isLoading = false.obs;
+  var isSaving = false.obs;
   var perPage = 10.obs;
 
   // Search
@@ -70,7 +71,9 @@ class KategoriSopController extends GetxController {
       return;
     }
 
-    isLoading.value = true;
+    if (isSaving.value) return;
+
+    isSaving.value = true;
     try {
       final data = KategoriSopModel(
         kode: kodeController.text,
@@ -81,16 +84,12 @@ class KategoriSopController extends GetxController {
 
       if (id == null) {
         await _apiProvider.createKategoriSop(data);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Kategori SOP berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.updateKategoriSop(id, data);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Kategori SOP berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
       }
@@ -100,7 +99,7 @@ class KategoriSopController extends GetxController {
           backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Save Kategori Error: $e');
     } finally {
-      isLoading.value = false;
+      isSaving.value = false;
     }
   }
 
@@ -110,6 +109,7 @@ class KategoriSopController extends GetxController {
       message: 'Apakah Anda yakin ingin menghapus kategori ini?',
       icon: Icons.delete_sweep,
       onConfirm: () async {
+        if (isLoading.value) return;
         isLoading.value = true;
         try {
           await _apiProvider.deleteKategoriSop(id);

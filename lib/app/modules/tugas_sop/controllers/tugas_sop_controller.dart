@@ -14,6 +14,7 @@ class TugasSopController extends GetxController {
   
   var tugasSops = <TugasSopModel>[].obs;
   var isLoading = false.obs;
+  var isSaving = false.obs;
   var isInfoExpanded = true.obs;
   
   // Pagination & Search
@@ -106,7 +107,6 @@ class TugasSopController extends GetxController {
       selectedUserIds.add(userId);
     }
   }
-
   Future<void> submitAssignment() async {
     if (selectedSopId.value == null) {
       Get.snackbar('Peringatan', 'SOP harus dipilih',
@@ -137,6 +137,9 @@ class TugasSopController extends GetxController {
       return;
     }
 
+    if (isSaving.value) return;
+
+    isSaving.value = true;
     try {
       Map<String, dynamic> payload = {
         'sop_id': selectedSopId.value,
@@ -149,13 +152,15 @@ class TugasSopController extends GetxController {
       }
 
       debugPrint("Sending assignment payload: ${json.encode(payload)}");
-      final response = await _apiProvider.createTugasSop(payload);
-      Get.back(); // close dialog
+      await _apiProvider.createTugasSop(payload);
+      Get.back(closeOverlays: true); // close dialog
       Get.snackbar('Sukses', 'Berhasil menugaskan SOP', backgroundColor: Colors.green, colorText: Colors.white);
       fetchTugasSops();
     } catch (e) {
       Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint(e.toString());
+    } finally {
+      isSaving.value = false;
     }
   }
 
@@ -165,6 +170,8 @@ class TugasSopController extends GetxController {
       message: 'Apakah Anda yakin ingin menghapus penugasan ini? Tindakan ini tidak dapat dibatalkan.',
       icon: Icons.delete_forever,
       onConfirm: () async {
+        if (isLoading.value) return;
+        isLoading.value = true;
         try {
           await _apiProvider.deleteTugasSop(id);
           Get.snackbar(
@@ -178,6 +185,8 @@ class TugasSopController extends GetxController {
         } catch (e) {
            Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
            debugPrint(e.toString());
+        } finally {
+          isLoading.value = false;
         }
       },
     );

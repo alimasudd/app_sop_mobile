@@ -349,7 +349,7 @@ class PelaksanaanSopView extends GetView<PelaksanaanSopController> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Detail Pelaksanaan SOP', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                  IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close)),
                 ],
               ),
               const Divider(),
@@ -383,7 +383,7 @@ class PelaksanaanSopView extends GetView<PelaksanaanSopController> {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () => Get.back(),
+                  onPressed: () => Get.back(closeOverlays: true),
                   child: const Text('Tutup'),
                 ),
               ),
@@ -437,7 +437,7 @@ class PelaksanaanSopView extends GetView<PelaksanaanSopController> {
                       pelaksanaan == null ? 'Tambah Pelaksanaan SOP' : 'Edit Pelaksanaan SOP',
                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close, size: 20)),
+                    IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close, size: 20)),
                   ],
                 ),
               ),
@@ -539,7 +539,7 @@ class PelaksanaanSopView extends GetView<PelaksanaanSopController> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
+                    TextButton(onPressed: () => Get.back(closeOverlays: true), child: const Text('Batal')),
                     const SizedBox(width: 12),
                     Obx(() => ElevatedButton(
                       onPressed: controller.isSubmitting.value ? null : () => controller.submitForm(pelaksanaan: pelaksanaan),

@@ -205,12 +205,12 @@ class PelaksanaanSopController extends GetxController {
 
       if (pelaksanaan != null && pelaksanaan.id != null) {
         await _apiProvider.updatePelaksanaanSop(pelaksanaan.id!, input);
-        Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil diubah', 
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.createPelaksanaanSop(input);
-        Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil ditambahkan', 
             backgroundColor: Colors.green, colorText: Colors.white);
       }

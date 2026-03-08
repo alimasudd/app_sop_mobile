@@ -229,7 +229,7 @@ class TugasSopView extends GetView<TugasSopController> {
                         ],
                       ),
                     ),
-                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+                    IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
                   ],
                 ),
                 const Divider(height: 32),
@@ -298,8 +298,8 @@ class TugasSopView extends GetView<TugasSopController> {
                 const SizedBox(height: 32),
                 SizedBox(
                   width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () => controller.submitAssignment(),
+                  child: Obx(() => ElevatedButton(
+                    onPressed: controller.isSaving.value ? null : () => controller.submitAssignment(),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: controller.isMassal.value ? const Color(0xFF00C897) : const Color(0xFF1B4EAA),
                       foregroundColor: Colors.white,
@@ -307,10 +307,12 @@ class TugasSopView extends GetView<TugasSopController> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                     child: Text(
-                      controller.isMassal.value ? 'SIMPAN PENUGASAN MASSAL' : 'SIMPAN PENUGASAN',
+                      controller.isSaving.value 
+                        ? 'LOADING...' 
+                        : (controller.isMassal.value ? 'SIMPAN PENUGASAN MASSAL' : 'SIMPAN PENUGASAN'),
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
-                  ),
+                  )),
                 ),
               ],
             ),

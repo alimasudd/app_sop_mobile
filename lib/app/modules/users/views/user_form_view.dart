@@ -24,7 +24,7 @@ class UserFormView extends GetView<UsersController> {
             icon: const Icon(Icons.close, color: Colors.grey),
             onPressed: () {
               FocusManager.instance.primaryFocus?.unfocus();
-              Get.back();
+              Get.back(closeOverlays: true);
             },
           ),
         ],
@@ -131,7 +131,7 @@ class UserFormView extends GetView<UsersController> {
                   TextButton(
                     onPressed: () {
                       FocusManager.instance.primaryFocus?.unfocus();
-                      Get.back();
+                      Get.back(closeOverlays: true);
                     },
                     child: const Text('Batal', style: TextStyle(color: Color(0xFF495057))),
                   ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/user_model.dart';
 import 'package:app_sop/app/data/providers/api_provider.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class UsersController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -9,6 +10,7 @@ class UsersController extends GetxController {
   var users = <UserModel>[].obs;
   var filteredUsers = <UserModel>[].obs;
   var isLoading = false.obs;
+  var isSaving = false.obs;
   
   // Search
   final searchController = TextEditingController();
@@ -82,8 +84,10 @@ class UsersController extends GetxController {
       return;
     }
 
+    if (isSaving.value) return;
+
     FocusManager.instance.primaryFocus?.unfocus();
-    isLoading.value = true;
+    isSaving.value = true;
     try {
       final user = UserModel(
         nama: namaController.text,
@@ -97,16 +101,12 @@ class UsersController extends GetxController {
 
       if (id == null) {
         await _apiProvider.createUser(user);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        Get.back(); 
+        Get.back(closeOverlays: true); 
         Get.snackbar('Sukses', 'User berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.updateUser(id, user);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        Get.back(); 
+        Get.back(closeOverlays: true); 
         Get.snackbar('Sukses', 'User berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
       }
@@ -118,49 +118,31 @@ class UsersController extends GetxController {
           backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Save User Error: $e');
     } finally {
-      isLoading.value = false;
+      isSaving.value = false;
     }
   }
 
   void deleteUser(int id) async {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Hapus User', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.'),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              isLoading.value = true;
-              try {
-                await _apiProvider.deleteUser(id);
-                Get.snackbar('Sukses', 'User berhasil dihapus',
-                    backgroundColor: Colors.green, colorText: Colors.white);
-                fetchUsers();
-              } catch (e) {
-                Get.snackbar('Error', 'Gagal menghapus user: $e',
-                    backgroundColor: Colors.red, colorText: Colors.white);
-                debugPrint('Delete User Error: $e');
-              } finally {
-                isLoading.value = false;
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
+    ConfirmDialog.show(
+      title: 'Hapus User',
+      message: 'Apakah Anda yakin ingin menghapus user ini? Tindakan ini tidak dapat dibatalkan.',
+      icon: Icons.person_remove,
+      onConfirm: () async {
+        if (isLoading.value) return;
+        isLoading.value = true;
+        try {
+          await _apiProvider.deleteUser(id);
+          Get.snackbar('Sukses', 'User berhasil dihapus',
+              backgroundColor: Colors.green, colorText: Colors.white);
+          fetchUsers();
+        } catch (e) {
+          Get.snackbar('Error', 'Gagal menghapus user: $e',
+              backgroundColor: Colors.red, colorText: Colors.white);
+          debugPrint('Delete User Error: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      },
     );
   }
 

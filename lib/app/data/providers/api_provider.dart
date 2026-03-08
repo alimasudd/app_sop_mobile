@@ -650,6 +650,21 @@ class ApiProvider {
       _handleError(response);
     }
   }
+
+  Future<void> gantiPasswordKaryawan(String passwordBaru, String passwordBaruConfirmation) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/karyawan/ganti-password'),
+      headers: await _getHeaders(),
+      body: json.encode({
+        'password_baru': passwordBaru,
+        'password_baru_confirmation': passwordBaruConfirmation,
+      }),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _handleError(response);
+    }
+  }
 }
 
 

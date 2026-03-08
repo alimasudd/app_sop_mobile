@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
 import 'package:app_sop/app/modules/kategori_sop/controllers/kategori_sop_controller.dart';
+import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
+import 'package:app_sop/app/routes/app_pages.dart';
 
 class KategoriSopView extends GetView<KategoriSopController> {
   const KategoriSopView({Key? key}) : super(key: key);
@@ -79,7 +81,18 @@ class KategoriSopView extends GetView<KategoriSopController> {
               const SizedBox(width: 10),
               ElevatedButton.icon(
                 onPressed: () {
-                    // Logic to navigate to SOP management
+                    try {
+                      if (Get.isRegistered<HomeController>()) {
+                        Get.find<HomeController>().changeIndex(13);
+                        if (Get.currentRoute == Routes.KATEGORI_SOP) {
+                           Get.offNamed(Routes.HOME);
+                        }
+                      } else {
+                        Get.offNamed(Routes.SOP);
+                      }
+                    } catch (e) {
+                      Get.snackbar('Error', 'Gagal menuju Kelola SOP: $e');
+                    }
                 },
                 icon: const Icon(Icons.description, size: 18),
                 label: const Text('Kelola SOP', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -418,7 +431,19 @@ class KategoriSopView extends GetView<KategoriSopController> {
                   const SizedBox(width: 10),
                   ElevatedButton.icon(
                     onPressed: () {
-                        // Navigate to Kelola SOP
+                        Get.back(); // Close dialog first
+                        try {
+                          if (Get.isRegistered<HomeController>()) {
+                            Get.find<HomeController>().changeIndex(13);
+                            if (Get.currentRoute == Routes.KATEGORI_SOP) {
+                               Get.offNamed(Routes.HOME);
+                            }
+                          } else {
+                            Get.offNamed(Routes.SOP);
+                          }
+                        } catch (e) {
+                          Get.snackbar('Error', 'Gagal menuju Kelola SOP: $e');
+                        }
                     },
                     icon: const Icon(Icons.open_in_new, size: 16),
                     label: const Text('Kelola SOP'),

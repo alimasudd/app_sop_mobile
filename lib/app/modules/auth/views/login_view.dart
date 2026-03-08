@@ -17,9 +17,9 @@ class LoginView extends GetView<AuthController> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo placeholder - Using a generic Icon since we can't easily embed local artifact path in runtime asset system
+                // App Logo
                 Container(
-                  padding: const EdgeInsets.all(15),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.circle,
@@ -31,10 +31,13 @@ class LoginView extends GetView<AuthController> {
                       ),
                     ],
                   ),
-                  child: const Icon(
-                    Icons.local_shipping_outlined,
-                    size: 60,
-                    color: Color(0xFF2D5BD0),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/icons/sop.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),

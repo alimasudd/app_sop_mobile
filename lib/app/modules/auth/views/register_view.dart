@@ -24,7 +24,14 @@ class RegisterView extends GetView<AuthController> {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
-                const Icon(Icons.person_add_outlined, size: 60, color: Color(0xFF2D5BD0)),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/icons/sop.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                  ),
+                ),
                 const SizedBox(height: 10),
                 const Text(
                   'Buat Akun Baru',

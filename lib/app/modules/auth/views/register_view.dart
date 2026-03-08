@@ -24,6 +24,7 @@ class RegisterView extends GetView<AuthController> {
             padding: const EdgeInsets.symmetric(horizontal: 30),
             child: Column(
               children: [
+                const SizedBox(height: 30),
                 ClipOval(
                   child: Image.asset(
                     'assets/icons/sop.png',
@@ -32,7 +33,7 @@ class RegisterView extends GetView<AuthController> {
                     fit: BoxFit.cover,
                   ),
                 ),
-                const SizedBox(height: 10),
+                const SizedBox(height: 20),
                 const Text(
                   'Buat Akun Baru',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF242B42)),

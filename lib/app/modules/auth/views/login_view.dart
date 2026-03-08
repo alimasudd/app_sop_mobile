@@ -18,26 +18,12 @@ class LoginView extends GetView<AuthController> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 // App Logo
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 10,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/icons/sop.png',
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
+                ClipOval(
+                  child: Image.asset(
+                    'assets/icons/sop.png',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -179,10 +165,10 @@ class LoginView extends GetView<AuthController> {
                 const SizedBox(height: 40),
                 
                 // Test Connection Button (Keep for debugging as requested before)
-                TextButton(
-                  onPressed: () => controller.testApi(),
-                  child: const Text('Cek Koneksi Server', style: TextStyle(color: Colors.grey, fontSize: 12)),
-                ),
+                // TextButton(
+                //   onPressed: () => controller.testApi(),
+                //   child: const Text('Cek Koneksi Server', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                // ),
               ],
             ),
           ),

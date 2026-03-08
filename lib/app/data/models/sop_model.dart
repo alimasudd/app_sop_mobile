@@ -8,7 +8,7 @@ class SopModel {
   String? tanggalBerlaku;
   String? tanggalKadaluarsa;
   String? status;
-  String? periode;
+  String? statusSop; // enum('mutlak', 'custom')
   dynamic kategori; // Usually map, we can leave as dynamic or specific model
   int? langkahCount;
   int? totalPoin;
@@ -23,7 +23,7 @@ class SopModel {
     this.tanggalBerlaku,
     this.tanggalKadaluarsa,
     this.status,
-    this.periode,
+    this.statusSop,
     this.kategori,
     this.langkahCount,
     this.totalPoin,
@@ -39,7 +39,7 @@ class SopModel {
     tanggalBerlaku = json['tanggal_berlaku']?.toString();
     tanggalKadaluarsa = json['tanggal_kadaluarsa']?.toString();
     status = json['status']?.toString();
-    periode = json['periode']?.toString();
+    statusSop = json['status_sop']?.toString();
     kategori = json['kategori'];
     langkahCount = json['langkah_count'] != null ? int.tryParse(json['langkah_count'].toString()) : 0;
     totalPoin = json['total_poin'] != null ? int.tryParse(json['total_poin'].toString()) : 0;
@@ -56,7 +56,7 @@ class SopModel {
     data['tanggal_berlaku'] = tanggalBerlaku;
     data['tanggal_kadaluarsa'] = tanggalKadaluarsa;
     data['status'] = status;
-    data['periode'] = periode;
+    data['status_sop'] = statusSop;
     return data;
   }
 }

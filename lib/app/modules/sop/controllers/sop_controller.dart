@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
@@ -27,7 +28,7 @@ class SopController extends GetxController {
   
   var selectedKategoriId = RxnInt();
   var selectedStatus = 'aktif'.obs;
-  var selectedPeriode = 'Harian'.obs;
+  var selectedStatusSop = 'mutlak'.obs; // matches enum('mutlak', 'custom')
 
   @override
   void onInit() {
@@ -71,8 +72,8 @@ class SopController extends GetxController {
       tanggalBerlakuController.text = item.tanggalBerlaku ?? '';
       tanggalKadaluarsaController.text = item.tanggalKadaluarsa ?? '';
       selectedKategoriId.value = item.katsopId;
-      selectedStatus.value = item.status == 'nonaktif' ? 'nonaktif' : 'aktif';
-      selectedPeriode.value = item.periode ?? 'Harian';
+      selectedStatus.value = item.status ?? 'aktif';
+      selectedStatusSop.value = item.statusSop ?? 'mutlak';
     } else {
       kodeController.clear();
       namaController.clear();
@@ -82,7 +83,7 @@ class SopController extends GetxController {
       tanggalKadaluarsaController.clear();
       selectedKategoriId.value = null;
       selectedStatus.value = 'aktif';
-      selectedPeriode.value = 'Harian';
+      selectedStatusSop.value = 'mutlak';
     }
   }
 
@@ -107,8 +108,10 @@ class SopController extends GetxController {
         tanggalBerlaku: tglBerlaku,
         tanggalKadaluarsa: tglKadaluarsa,
         status: selectedStatus.value,
-        periode: selectedPeriode.value,
+        statusSop: selectedStatusSop.value.toLowerCase(),
       );
+
+      debugPrint('SOP Payload: ${json.encode(sop.toJson())}');
 
       if (id == null) {
         await _apiProvider.createSop(sop);
@@ -116,12 +119,7 @@ class SopController extends GetxController {
         await _apiProvider.updateSop(id, sop);
       }
 
-      // Close Dialog gracefully
-      FocusManager.instance.primaryFocus?.unfocus();
-      await Future.delayed(const Duration(milliseconds: 100));
-      if (Get.isDialogOpen ?? false) {
-        Get.back();
-      }
+      Get.back(closeOverlays: true);
 
       fetchSops();
       Get.snackbar('Sukses', 'Data SOP berhasil disimpan', backgroundColor: Colors.green, colorText: Colors.white);
@@ -129,7 +127,7 @@ class SopController extends GetxController {
       Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Save SOP Error: $e');
     } finally {
-      isSaving(false);
+      isSaving.value = false;
     }
   }
 

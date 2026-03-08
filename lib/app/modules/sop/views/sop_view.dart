@@ -266,7 +266,7 @@ class SopView extends GetView<SopController> {
                     alignment: WrapAlignment.end,
                     children: [
                       _infoColumn('KATEGORI', item.kategori?['nama'] ?? '-', Colors.cyan),
-                      _infoColumn('PERIODE', item.periode ?? 'Harian', const Color(0xFF2575FC)),
+                      _infoColumn('TIPE', item.statusSop ?? 'mutlak', const Color(0xFF2575FC)),
                       _infoColumn('VERSI', item.versi ?? '1.0', Colors.grey),
                       _infoBadge('LANGKAH', '${item.langkahCount ?? 0}', Colors.purple),
                       _infoBadge('POIN', '${item.totalPoin ?? 0}', Colors.green),
@@ -350,7 +350,7 @@ class SopView extends GetView<SopController> {
                         ),
                       ],
                     ),
-                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
+                    IconButton(onPressed: () => Get.back(closeOverlays: true), icon: const Icon(Icons.close)),
                   ],
                 ),
                 const Divider(),
@@ -428,7 +428,7 @@ class SopView extends GetView<SopController> {
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: controller.selectedStatus.value,
-                                items: ['aktif', 'nonaktif'].map((e) {
+                                items: ['aktif', 'nonaktif', 'draft', 'expired'].map((e) {
                                   return DropdownMenuItem(value: e, child: Text(e.capitalizeFirst!));
                                 }).toList(),
                                 onChanged: (val) => controller.selectedStatus.value = val!,
@@ -443,7 +443,7 @@ class SopView extends GetView<SopController> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                           _label('Periode SOP *'),
+                           _label('Tipe SOP *'),
                            const SizedBox(height: 8),
                            Obx(() => Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -455,11 +455,11 @@ class SopView extends GetView<SopController> {
                             child: DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
                                 isExpanded: true,
-                                value: controller.selectedPeriode.value,
-                                items: ['Harian', 'Mingguan', 'Bulanan', 'Tahunan'].map((e) {
-                                  return DropdownMenuItem(value: e, child: Text(e));
+                                value: controller.selectedStatusSop.value,
+                                items: ['mutlak', 'custom'].map((e) {
+                                  return DropdownMenuItem(value: e, child: Text(e.capitalizeFirst!));
                                 }).toList(),
-                                onChanged: (val) => controller.selectedPeriode.value = val!,
+                                onChanged: (val) => controller.selectedStatusSop.value = val!,
                               ),
                             ),
                           )),
@@ -494,7 +494,7 @@ class SopView extends GetView<SopController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
+                    TextButton(onPressed: () => Get.back(closeOverlays: true), child: const Text('Batal')),
                     const SizedBox(width: 12),
                     ElevatedButton.icon(
                       onPressed: () => controller.saveSop(item?.id),

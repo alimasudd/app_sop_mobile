@@ -106,24 +106,56 @@ class SopView extends GetView<SopController> {
             ],
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: controller.searchController,
-            onChanged: controller.searchSop,
-            decoration: InputDecoration(
-              hintText: 'Cari SOP...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+          Row(
+            children: [
+              Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFFDDE2E5)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: Obx(() => DropdownButton<int>(
+                    value: controller.perPage.value,
+                    items: const [
+                      DropdownMenuItem(value: 10, child: Text('10')),
+                      DropdownMenuItem(value: 25, child: Text('25')),
+                      DropdownMenuItem(value: 50, child: Text('50')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        controller.perPage.value = val;
+                        controller.fetchSops();
+                      }
+                    },
+                  )),
+                ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: controller.searchController,
+                  onChanged: controller.searchSop,
+                  decoration: InputDecoration(
+                    hintText: 'Cari SOP...',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -132,6 +164,7 @@ class SopView extends GetView<SopController> {
 
   Widget _buildSopCard(SopModel item, int no) {
     return Card(
+      color: Colors.white,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
@@ -209,9 +242,11 @@ class SopView extends GetView<SopController> {
                 ),
                 // Table like info
                 Expanded(
-                  flex: 3,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  flex: 4,
+                  child: Wrap(
+                    spacing: 8,
+                    runSpacing: 12,
+                    alignment: WrapAlignment.end,
                     children: [
                       _infoColumn('KATEGORI', item.kategori?['nama'] ?? '-', Colors.cyan),
                       _infoColumn('PERIODE', item.periode ?? 'Harian', const Color(0xFF2575FC)),

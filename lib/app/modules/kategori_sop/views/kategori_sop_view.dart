@@ -106,24 +106,56 @@ class KategoriSopView extends GetView<KategoriSopController> {
             ],
           ),
           const SizedBox(height: 16),
-          TextField(
-            controller: controller.searchController,
-            onChanged: controller.searchKategori,
-            decoration: InputDecoration(
-              hintText: 'Cari Kategori...',
-              prefixIcon: const Icon(Icons.search),
-              filled: true,
-              fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(vertical: 0),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+          Row(
+            children: [
+              Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: const Color(0xFFDDE2E5)),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: Obx(() => DropdownButton<int>(
+                    value: controller.perPage.value,
+                    items: const [
+                      DropdownMenuItem(value: 10, child: Text('10')),
+                      DropdownMenuItem(value: 25, child: Text('25')),
+                      DropdownMenuItem(value: 50, child: Text('50')),
+                    ],
+                    onChanged: (val) {
+                      if (val != null) {
+                        controller.perPage.value = val;
+                        controller.fetchKategoriSops(query: controller.searchController.text);
+                      }
+                    },
+                  )),
+                ),
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: TextField(
+                  controller: controller.searchController,
+                  onChanged: controller.searchKategori,
+                  decoration: InputDecoration(
+                    hintText: 'Cari Kategori...',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.white,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: Color(0xFFDDE2E5)),
+                    ),
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
         ],
       ),
@@ -132,6 +164,7 @@ class KategoriSopView extends GetView<KategoriSopController> {
 
   Widget _buildKategoriCard(KategoriSopModel item, int no) {
     return Card(
+      color: Colors.white,
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(

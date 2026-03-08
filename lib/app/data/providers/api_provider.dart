@@ -12,8 +12,8 @@ import 'package:app_sop/app/data/models/tugas_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_pelaksanaan_model.dart';
 
 class ApiProvider {
-  final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
-  // final String baseUrl = "http://192.168.1.5:80/api";
+  // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
+  final String baseUrl = "http://192.168.1.5:80/api";
 
   // Health Check
   Future<http.Response> checkHealth() async {
@@ -547,6 +547,22 @@ class ApiProvider {
   Future<void> deletePelaksanaanSop(int id) async {
     final response = await http.delete(Uri.parse('$baseUrl/pelaksanaan-sops/$id'), headers: await _getHeaders());
     if (response.statusCode != 200) throw Exception('Gagal menghapus pelaksanaan SOP');
+  }
+
+  // ===============================
+  // KARYAWAN API
+  // ===============================
+
+  Future<Map<String, dynamic>> getDashboardKaryawan() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/karyawan/dashboard'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      return decoded['data'] ?? {};
+    }
+    throw Exception('Gagal memuat dashboard karyawan');
   }
 }
 

@@ -600,5 +600,21 @@ class ApiProvider {
       _handleError(response);
     }
   }
+
+  Future<Map<String, dynamic>> getLaporanKaryawan({String? startDate, String? endDate}) async {
+    String url = '$baseUrl/karyawan/laporan';
+    if (startDate != null && endDate != null) {
+      url += '?start_date=$startDate&end_date=$endDate';
+    }
+    final response = await http.get(
+      Uri.parse(url),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      return decoded['data'] ?? {};
+    }
+    throw Exception('Gagal memuat laporan karyawan');
+  }
 }
 

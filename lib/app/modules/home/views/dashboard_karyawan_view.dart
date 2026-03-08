@@ -476,7 +476,11 @@ class DashboardKaryawanView extends StatelessWidget {
               iconColor: const Color(0xFF4A65E6),
               title: 'Ganti Password',
               subtitle: 'Ubah password akun',
-              onTap: () {}, // Handle navigation to Change Password
+              onTap: () {
+                if (Get.isRegistered<HomeController>()) {
+                  Get.find<HomeController>().changeIndex(8);
+                }
+              },
             ),
           ],
         ),

@@ -9,6 +9,7 @@ import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
 import 'package:app_sop/app/data/models/sop_langkah_model.dart';
 import 'package:app_sop/app/data/models/tugas_sop_model.dart';
+import 'package:app_sop/app/data/models/sop_pelaksanaan_model.dart';
 
 class ApiProvider {
   final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
@@ -489,6 +490,62 @@ class ApiProvider {
   Future<void> deleteTugasSop(int id) async {
     final response = await http.delete(Uri.parse('$baseUrl/tugas-sops/$id'), headers: await _getHeaders());
     if (response.statusCode != 200) throw Exception('Gagal menghapus tugas SOP');
+  }
+
+  // ===============================
+  // PELAKSANAAN SOP API
+  // ===============================
+
+  Future<List<SopPelaksanaanModel>> getPelaksanaanSops({String? search, int perPage = 10}) async {
+    String url = '$baseUrl/pelaksanaan-sops?per_page=$perPage';
+    if (search != null && search.isNotEmpty) url += '&search=$search';
+
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      List dataList = [];
+      if (decoded['data'] != null) {
+        var data = decoded['data'];
+        if (data is Map) {
+          if (data['pelaksanaans'] != null) {
+            dataList = data['pelaksanaans'];
+          } else if (data['items'] != null) {
+            dataList = data['items'];
+          }
+        } else if (data is List) {
+          dataList = data;
+        }
+      }
+      return dataList.map((e) => SopPelaksanaanModel.fromJson(e)).toList();
+    }
+    throw Exception('Gagal memuat pelaksanaan SOP');
+  }
+
+  Future<void> createPelaksanaanSop(SopPelaksanaanModel pelaksanaan) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/pelaksanaan-sops'),
+      headers: await _getHeaders(),
+      body: json.encode(pelaksanaan.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updatePelaksanaanSop(int id, SopPelaksanaanModel pelaksanaan) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/pelaksanaan-sops/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(pelaksanaan.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deletePelaksanaanSop(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/pelaksanaan-sops/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus pelaksanaan SOP');
   }
 }
 

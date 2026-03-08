@@ -12,47 +12,64 @@ class SopView extends GetView<SopController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FA),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          _buildToolbar(),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value && controller.sops.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (controller.sops.isEmpty) {
-                return const Center(child: Text('Data SOP tidak ditemukan'));
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.sops.length,
-                itemBuilder: (context, index) {
-                  final item = controller.sops[index];
-                  return _buildSopCard(item, index + 1);
-                },
-              );
-            }),
-          ),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Content (Sticky)
+            _buildHeader(),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildToolbar(),
+                    Obx(() {
+                      if (controller.isLoading.value && controller.sops.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()));
+                      }
+                      if (controller.sops.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: Text('Data SOP tidak ditemukan')));
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.sops.length,
+                        itemBuilder: (context, index) {
+                          final item = controller.sops[index];
+                          return _buildSopCard(item, index + 1);
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: const Row(
-        children: [
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Row(
+        children: const [
           Text(
             'Master Data',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF242B42)),
           ),
           SizedBox(width: 8),
           Text(
             'SOP (Standard Operating Procedure)',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 14, color: Color(0xFF7E8494)),
           ),
         ],
       ),

@@ -12,30 +12,45 @@ class TugasSopView extends GetView<TugasSopController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FA),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          _buildInfoBox(),
-          _buildToolbar(),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value && controller.tugasSops.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (controller.tugasSops.isEmpty) {
-                return const Center(child: Text('Data Penugasan SOP tidak ditemukan'));
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.tugasSops.length,
-                itemBuilder: (context, index) {
-                  return _buildTugasCard(controller.tugasSops[index], index + 1);
-                },
-              );
-            }),
-          ),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Content
+            _buildHeader(),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoBox(),
+                    _buildToolbar(),
+                    Obx(() {
+                      if (controller.isLoading.value && controller.tugasSops.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()));
+                      }
+                      
+                      if (controller.tugasSops.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: Text('Data penugasan tidak ditemukan')));
+                      }
+        
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.tugasSops.length,
+                        itemBuilder: (context, index) {
+                          return _buildTugasCard(controller.tugasSops[index], index + 1);
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -309,17 +324,21 @@ class TugasSopView extends GetView<TugasSopController> {
   // ... (Header info remains the same)
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: const Row(
-        children: [
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Row(
+        children: const [
           Text(
             'Master Data',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF242B42)),
           ),
           SizedBox(width: 8),
           Text(
             'Tugas SOP',
-            style: TextStyle(fontSize: 14, color: Colors.grey),
+            style: TextStyle(fontSize: 14, color: Color(0xFF7E8494)),
           ),
         ],
       ),
@@ -328,30 +347,41 @@ class TugasSopView extends GetView<TugasSopController> {
 
   Widget _buildInfoBox() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.fromLTRB(16, 16, 16, 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF00C7E6),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
         children: [
-          Icon(Icons.info, color: Colors.white, size: 20),
-          SizedBox(width: 8),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          InkWell(
+            onTap: () => controller.isInfoExpanded.toggle(),
+            child: Row(
               children: [
-                Text('Informasi', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                SizedBox(height: 4),
-                Text(
-                  'Halaman ini digunakan untuk menugaskan karyawan pada SOP tertentu. Anda bisa menugaskan karyawan ke seluruh langkah dalam SOP, atau langkah tertentu saja.',
-                  style: TextStyle(color: Colors.white, fontSize: 13),
-                ),
+                const Icon(Icons.info, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                const Text('Informasi Penugasan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                const Spacer(),
+                Obx(() => Icon(
+                  controller.isInfoExpanded.value ? Icons.expand_less : Icons.expand_more,
+                  color: Colors.white,
+                )),
               ],
             ),
-          )
+          ),
+          Obx(() {
+            if (!controller.isInfoExpanded.value) return const SizedBox.shrink();
+            return Column(
+              children: [
+                const SizedBox(height: 8),
+                Text(
+                  'Halaman ini digunakan untuk menugaskan karyawan pada SOP tertentu. Anda bisa menugaskan karyawan ke seluruh langkah dalam SOP, atau langkah tertentu saja.',
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                ),
+              ],
+            );
+          }),
         ],
       ),
     );

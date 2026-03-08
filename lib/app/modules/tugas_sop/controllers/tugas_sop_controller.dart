@@ -14,6 +14,7 @@ class TugasSopController extends GetxController {
   
   var tugasSops = <TugasSopModel>[].obs;
   var isLoading = false.obs;
+  var isInfoExpanded = true.obs;
   
   // Pagination & Search
   var perPage = 10.obs;

@@ -10,52 +10,64 @@ class RuangView extends GetView<RuangController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FA),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildHeader(),
-          _buildToolbar(),
-          Expanded(
-            child: Obx(() {
-              if (controller.isLoading.value && controller.rooms.isEmpty) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (controller.rooms.isEmpty) {
-                return const Center(child: Text('Data ruang tidak ditemukan'));
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: controller.rooms.length,
-                itemBuilder: (context, index) {
-                  final room = controller.rooms[index];
-                  return _buildRoomCard(room, index + 1);
-                },
-              );
-            }),
-          ),
-        ],
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Header Content (Sticky)
+            _buildHeader(),
+            
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildToolbar(),
+                    Obx(() {
+                      if (controller.isLoading.value && controller.rooms.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: CircularProgressIndicator()));
+                      }
+                      if (controller.rooms.isEmpty) {
+                        return const Center(child: Padding(padding: EdgeInsets.all(20), child: Text('Data ruang tidak ditemukan')));
+                      }
+                      return ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: controller.rooms.length,
+                        itemBuilder: (context, index) {
+                          final room = controller.rooms[index];
+                          return _buildRoomCard(room, index + 1);
+                        },
+                      );
+                    }),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            children: [
-              Text(
-                'Master Data',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
-              ),
-              SizedBox(width: 8),
-              Text(
-                'Ruang',
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFE5E7EB))),
+      ),
+      child: Row(
+        children: const [
+          Text(
+            'Master Data',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF242B42)),
+          ),
+          SizedBox(width: 8),
+          Text(
+            'Ruang',
+            style: TextStyle(fontSize: 14, color: Color(0xFF7E8494)),
           ),
         ],
       ),

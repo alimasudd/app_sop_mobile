@@ -274,7 +274,7 @@ class HomeView extends GetView<HomeController> {
       case 13: return const SopView();
       case 14: return const LangkahSopView();
       case 15: return const TugasSopView();
-      case 16: return _buildPlaceholder('Master: Pelaksanaan SOP');
+      case 16: return _buildPlaceholder('Pelaksanaan SOP');
       case 20: return _buildPlaceholder('Laporan SOP');
       case 21: return _buildPlaceholder('Laporan Karyawan');
       case 4: return _buildPlaceholder('Pengaturan');
@@ -324,10 +324,10 @@ class HomeView extends GetView<HomeController> {
       case 2: return 'Pengawas SOP Harian';
       case 3: return 'Monitor Tugas';
       case 12: return 'Kategori SOP';
-      case 13: return 'Master: SOP';
-      case 14: return 'Master: Langkah SOP';
-      case 15: return 'Master: Tugas SOP';
-      case 16: return 'Master: Pelaksanaan SOP';
+      case 13: return 'SOP';
+      case 14: return 'Langkah SOP';
+      case 15: return 'Tugas SOP';
+      case 16: return 'Pelaksanaan SOP';
       case 20: return 'Laporan SOP';
       case 21: return 'Laporan Karyawan';
       case 4: return 'Pengaturan';

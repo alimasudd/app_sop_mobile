@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
 import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 import 'package:app_sop/app/data/providers/api_provider.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class SopController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -133,16 +134,12 @@ class SopController extends GetxController {
   }
 
   Future<void> deleteSop(int id) async {
-    Get.defaultDialog(
-      title: 'Konfirmasi',
-      middleText: 'Apakah Anda yakin ingin menghapus SOP ini?',
-      textConfirm: 'Hapus',
-      textCancel: 'Batal',
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+    ConfirmDialog.show(
+      title: 'Hapus SOP',
+      message: 'Apakah Anda yakin ingin menghapus SOP ini? Semua langkah di dalamnya akan ikut terhapus.',
+      icon: Icons.warning_amber_rounded,
       onConfirm: () async {
         try {
-          Get.back(); // close dialog
           await _apiProvider.deleteSop(id);
           fetchSops();
           Get.snackbar('Sukses', 'Data berhasil dihapus', backgroundColor: Colors.green, colorText: Colors.white);

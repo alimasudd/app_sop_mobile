@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:app_sop/app/routes/app_pages.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class HomeController extends GetxController {
   final selectedIndex = 0.obs;
@@ -63,42 +64,20 @@ class HomeController extends GetxController {
   }
 
   void logout() async {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Konfirmasi Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Apakah Anda yakin ingin keluar dari aplikasi?'),
-          ],
-        ),
-        contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.remove('token');
-              await prefs.remove('user_email');
-              await prefs.remove('user_name');
-              await prefs.remove('level_id');
-              Get.offAllNamed(Routes.LOGIN);
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            ),
-            child: const Text('Ya, Keluar'),
-          ),
-        ],
-      ),
+    ConfirmDialog.show(
+      title: 'Konfirmasi Keluar',
+      message: 'Apakah Anda yakin ingin keluar dari aplikasi?',
+      confirmText: 'Ya, Keluar',
+      confirmColor: Colors.blue, // Match login theme or keep standard
+      icon: Icons.logout,
+      onConfirm: () async {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.remove('token');
+        await prefs.remove('user_email');
+        await prefs.remove('user_name');
+        await prefs.remove('level_id');
+        Get.offAllNamed(Routes.LOGIN);
+      },
     );
   }
 }

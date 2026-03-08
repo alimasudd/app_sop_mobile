@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
 import 'package:app_sop/app/data/providers/api_provider.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class KategoriSopController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -104,34 +105,24 @@ class KategoriSopController extends GetxController {
   }
 
   void deleteKategori(int id) {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Hapus Kategori', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Apakah Anda yakin ingin menghapus kategori ini?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              isLoading.value = true;
-              try {
-                await _apiProvider.deleteKategoriSop(id);
-                Get.snackbar('Sukses', 'Kategori berhasil dihapus',
-                    backgroundColor: Colors.green, colorText: Colors.white);
-                fetchKategoriSops(query: searchController.text);
-              } catch (e) {
-                Get.snackbar('Error', 'Gagal menghapus kategori: $e',
-                    backgroundColor: Colors.red, colorText: Colors.white);
-              } finally {
-                isLoading.value = false;
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
+    ConfirmDialog.show(
+      title: 'Hapus Kategori',
+      message: 'Apakah Anda yakin ingin menghapus kategori ini?',
+      icon: Icons.delete_sweep,
+      onConfirm: () async {
+        isLoading.value = true;
+        try {
+          await _apiProvider.deleteKategoriSop(id);
+          Get.snackbar('Sukses', 'Kategori berhasil dihapus',
+              backgroundColor: Colors.green, colorText: Colors.white);
+          fetchKategoriSops(query: searchController.text);
+        } catch (e) {
+          Get.snackbar('Error', 'Gagal menghapus kategori: $e',
+              backgroundColor: Colors.red, colorText: Colors.white);
+        } finally {
+          isLoading.value = false;
+        }
+      },
     );
   }
 

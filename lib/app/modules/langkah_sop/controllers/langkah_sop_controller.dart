@@ -5,6 +5,7 @@ import 'package:app_sop/app/data/models/sop_langkah_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
 import 'package:app_sop/app/data/models/ruang_model.dart';
 import 'package:app_sop/app/data/models/user_model.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class LangkahSopController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -189,14 +190,21 @@ class LangkahSopController extends GetxController {
   }
 
   Future<void> deleteLangkah(int id) async {
-    try {
-      await _apiProvider.deleteLangkahSop(id);
-      Get.snackbar('Sukses', 'Langkah SOP berhasil dihapus',
-          backgroundColor: Colors.green[100], colorText: Colors.green[900]);
-      fetchLangkah();
-    } catch (e) {
-      Get.snackbar('Error', 'Gagal menghapus langkah SOP',
-          backgroundColor: Colors.red[100], colorText: Colors.red[900]);
-    }
+    ConfirmDialog.show(
+      title: 'Hapus Langkah',
+      message: 'Apakah Anda yakin ingin menghapus langkah SOP ini?',
+      icon: Icons.delete_outline,
+      onConfirm: () async {
+        try {
+          await _apiProvider.deleteLangkahSop(id);
+          Get.snackbar('Sukses', 'Langkah SOP berhasil dihapus',
+              backgroundColor: Colors.green, colorText: Colors.white);
+          fetchLangkah();
+        } catch (e) {
+          Get.snackbar('Error', 'Gagal menghapus langkah SOP',
+              backgroundColor: Colors.red, colorText: Colors.white);
+        }
+      },
+    );
   }
 }

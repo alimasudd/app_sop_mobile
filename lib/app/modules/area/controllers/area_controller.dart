@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/area_model.dart';
 import 'package:app_sop/app/data/providers/api_provider.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 
 class AreaController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
@@ -92,35 +93,25 @@ class AreaController extends GetxController {
   }
 
   void deleteArea(int id) {
-    Get.dialog(
-      AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Hapus Area', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Apakah Anda yakin ingin menghapus area ini?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          ElevatedButton(
-            onPressed: () async {
-              Get.back();
-              isLoading.value = true;
-              try {
-                await _apiProvider.deleteArea(id);
-                Get.snackbar('Sukses', 'Area berhasil dihapus',
-                    backgroundColor: Colors.green, colorText: Colors.white);
-                fetchAreas(query: searchController.text);
-              } catch (e) {
-                Get.snackbar('Error', 'Gagal menghapus area: $e',
-                    backgroundColor: Colors.red, colorText: Colors.white);
-                debugPrint('Delete Area Error: $e');
-              } finally {
-                isLoading.value = false;
-              }
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
+    ConfirmDialog.show(
+      title: 'Hapus Area',
+      message: 'Apakah Anda yakin ingin menghapus area ini?',
+      icon: Icons.delete_sweep,
+      onConfirm: () async {
+        isLoading.value = true;
+        try {
+          await _apiProvider.deleteArea(id);
+          Get.snackbar('Sukses', 'Area berhasil dihapus',
+              backgroundColor: Colors.green, colorText: Colors.white);
+          fetchAreas(query: searchController.text);
+        } catch (e) {
+          Get.snackbar('Error', 'Gagal menghapus area: $e',
+              backgroundColor: Colors.red, colorText: Colors.white);
+          debugPrint('Delete Area Error: $e');
+        } finally {
+          isLoading.value = false;
+        }
+      },
     );
   }
 

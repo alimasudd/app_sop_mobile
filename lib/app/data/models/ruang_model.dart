@@ -18,8 +18,8 @@ class RuangModel {
   });
 
   RuangModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    areaId = json['area_id'];
+    id = json['id'] != null ? int.tryParse(json['id'].toString()) : null;
+    areaId = json['area_id'] != null ? int.tryParse(json['area_id'].toString()) : null;
     nama = json['nama'];
     des = json['des'];
     createdAt = json['created_at'];

@@ -16,12 +16,12 @@ class KategoriSopModel {
   });
 
   KategoriSopModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
+    id = json['id'] != null ? int.tryParse(json['id'].toString()) : null;
     kode = json['kode']?.toString();
     nama = json['nama']?.toString();
     deskripsi = json['deskripsi']?.toString();
     status = json['status']?.toString();
-    sopsCount = json['sops_count'];
+    sopsCount = json['sops_count'] != null ? int.tryParse(json['sops_count'].toString()) : null;
   }
 
   Map<String, dynamic> toJson() {

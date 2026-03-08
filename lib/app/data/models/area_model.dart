@@ -10,9 +10,9 @@ class AreaModel {
   });
 
   AreaModel.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    nama = json['nama'];
-    des = json['des'];
+    id = json['id'] != null ? int.tryParse(json['id'].toString()) : null;
+    nama = json['nama']?.toString();
+    des = json['des']?.toString();
   }
 
   Map<String, dynamic> toJson() {

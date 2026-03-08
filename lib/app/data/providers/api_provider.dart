@@ -616,5 +616,40 @@ class ApiProvider {
     }
     throw Exception('Gagal memuat laporan karyawan');
   }
+
+  Future<Map<String, dynamic>> getProfilKaryawan() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/karyawan/profile'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      return decoded['data'] ?? {};
+    }
+    throw Exception('Gagal memuat profil karyawan');
+  }
+
+  Future<void> updateProfilKaryawan(String nama, String hp, {String? password, String? passwordConfirmation}) async {
+    final body = {
+      'nama': nama,
+      'hp': hp,
+    };
+    
+    if (password != null && password.isNotEmpty) {
+      body['password'] = password;
+      body['password_confirmation'] = passwordConfirmation ?? '';
+    }
+
+    final response = await http.put(
+      Uri.parse('$baseUrl/karyawan/profile'),
+      headers: await _getHeaders(),
+      body: json.encode(body),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _handleError(response);
+    }
+  }
 }
+
 

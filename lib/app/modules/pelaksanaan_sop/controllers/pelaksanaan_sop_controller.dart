@@ -70,7 +70,8 @@ class PelaksanaanSopController extends GetxController {
 
       await fetchPelaksanaans();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat data awal: $e');
+      Get.snackbar('Error', 'Gagal memuat data awal: $e', 
+          backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Gagal memuat data awal: $e');
     } finally {
       isLoading.value = false;
@@ -86,7 +87,8 @@ class PelaksanaanSopController extends GetxController {
       );
       pelaksanaanList.assignAll(data);
     } catch (e) {
-      Get.snackbar('Error', 'Gagal memuat pelaksanaan SOP: $e');
+      Get.snackbar('Error', 'Gagal memuat pelaksanaan SOP: $e', 
+          backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Gagal memuat pelaksanaan SOP: $e');
     } finally {
       isLoading.value = false;
@@ -177,7 +179,8 @@ class PelaksanaanSopController extends GetxController {
 
   Future<void> submitForm({SopPelaksanaanModel? pelaksanaan}) async {
     if (selectedSopId.value == null || selectedUserId.value == null) {
-      Get.snackbar('Peringatan', 'SOP dan Pelaksana harus diisi');
+      Get.snackbar('Peringatan', 'SOP dan Pelaksana harus diisi', 
+          backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 
@@ -203,15 +206,18 @@ class PelaksanaanSopController extends GetxController {
       if (pelaksanaan != null && pelaksanaan.id != null) {
         await _apiProvider.updatePelaksanaanSop(pelaksanaan.id!, input);
         Get.back();
-        Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil diubah');
+        Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil diubah', 
+            backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.createPelaksanaanSop(input);
         Get.back();
-        Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil ditambahkan');
+        Get.snackbar('Sukses', 'Pelaksanaan SOP berhasil ditambahkan', 
+            backgroundColor: Colors.green, colorText: Colors.white);
       }
       fetchPelaksanaans();
     } catch (e) {
-      Get.snackbar('Error', 'Gagal menyimpan data: $e');
+      Get.snackbar('Error', 'Gagal menyimpan data: $e', 
+          backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Gagal menyimpan data: $e');
     } finally {
       isSubmitting.value = false;
@@ -225,10 +231,12 @@ class PelaksanaanSopController extends GetxController {
       onConfirm: () async {
         try {
           await _apiProvider.deletePelaksanaanSop(id);
-          Get.snackbar('Sukses', 'Data berhasil dihapus');
+          Get.snackbar('Sukses', 'Data berhasil dihapus', 
+              backgroundColor: Colors.green, colorText: Colors.white);
           fetchPelaksanaans();
         } catch (e) {
-          Get.snackbar('Error', 'Gagal menghapus data: $e');
+          Get.snackbar('Error', 'Gagal menghapus data: $e', 
+              backgroundColor: Colors.red, colorText: Colors.white);
           debugPrint('Gagal menghapus data: $e');
         }
       },

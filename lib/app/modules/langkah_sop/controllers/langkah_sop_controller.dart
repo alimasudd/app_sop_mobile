@@ -65,7 +65,7 @@ class LangkahSopController extends GetxController {
     } catch (e) {
       print('Fetch Initial Data Error: $e');
       Get.snackbar('Error', 'Gagal memuat data master',
-          backgroundColor: Colors.red[100], colorText: Colors.red[900]);
+          backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading.value = false;
     }
@@ -149,7 +149,7 @@ class LangkahSopController extends GetxController {
   Future<void> submitForm({SopLangkahModel? langkah}) async {
     if (selectedSopId.value == null || deskripsiController.text.isEmpty || urutanController.text.isEmpty) {
       Get.snackbar('Peringatan', 'SOP, Urutan, dan Deskripsi Langkah harus diisi',
-          backgroundColor: Colors.orange[100], colorText: Colors.orange[900]);
+          backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 
@@ -173,17 +173,17 @@ class LangkahSopController extends GetxController {
         await _apiProvider.updateLangkahSop(langkah.id!, input);
         Get.back();
         Get.snackbar('Sukses', 'Langkah SOP berhasil diubah',
-            backgroundColor: Colors.green[100], colorText: Colors.green[900]);
+            backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.createLangkahSop(input);
         Get.back();
         Get.snackbar('Sukses', 'Langkah SOP berhasil ditambahkan',
-            backgroundColor: Colors.green[100], colorText: Colors.green[900]);
+            backgroundColor: Colors.green, colorText: Colors.white);
       }
       fetchLangkah();
     } catch (e) {
       Get.snackbar('Error', 'Gagal menyimpan data',
-          backgroundColor: Colors.red[100], colorText: Colors.red[900]);
+          backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isSubmitting.value = false;
     }

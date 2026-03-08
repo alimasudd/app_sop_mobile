@@ -60,7 +60,8 @@ class TugasSopController extends GetxController {
       );
       tugasSops.assignAll(list);
     } catch (e) {
-      Get.snackbar('Error', e.toString());
+      Get.snackbar('Error', e.toString(),
+          backgroundColor: Colors.red, colorText: Colors.white);
     } finally {
       isLoading(false);
     }
@@ -108,27 +109,31 @@ class TugasSopController extends GetxController {
 
   Future<void> submitAssignment() async {
     if (selectedSopId.value == null) {
-      Get.snackbar('Peringatan', 'SOP harus dipilih');
+      Get.snackbar('Peringatan', 'SOP harus dipilih',
+          backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
     
     List<int> userIds = [];
     if (isMassal.value) {
       if (selectedUserIds.isEmpty) {
-         Get.snackbar('Peringatan', 'Pilih minimal 1 karyawan');
+         Get.snackbar('Peringatan', 'Pilih minimal 1 karyawan',
+             backgroundColor: Colors.red, colorText: Colors.white);
          return;
       }
       userIds = selectedUserIds.toList();
     } else {
       if (selectedUserId.value == null) {
-         Get.snackbar('Peringatan', 'Karyawan harus dipilih');
+         Get.snackbar('Peringatan', 'Karyawan harus dipilih',
+             backgroundColor: Colors.red, colorText: Colors.white);
          return;
       }
       userIds = [selectedUserId.value!];
     }
 
     if (ditugaskanPada.value == 'tertentu' && selectedLangkahId.value == null) {
-      Get.snackbar('Peringatan', 'Langkah harus dipilih');
+      Get.snackbar('Peringatan', 'Langkah harus dipilih',
+          backgroundColor: Colors.red, colorText: Colors.white);
       return;
     }
 

@@ -464,7 +464,11 @@ class DashboardKaryawanView extends StatelessWidget {
               iconColor: const Color(0xFF4A65E6),
               title: 'Laporan Saya',
               subtitle: 'Lihat riwayat aktivitas',
-              onTap: () {}, // Handle navigation to My Reports
+              onTap: () {
+                if (Get.isRegistered<HomeController>()) {
+                  Get.find<HomeController>().changeIndex(6);
+                }
+              },
             ),
             const SizedBox(height: 12),
             _buildActionItem(

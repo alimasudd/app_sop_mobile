@@ -18,6 +18,8 @@ import '../modules/langkah_sop/bindings/langkah_sop_binding.dart';
 import '../modules/langkah_sop/views/langkah_sop_view.dart';
 import '../modules/tugas_sop/bindings/tugas_sop_binding.dart';
 import '../modules/tugas_sop/views/tugas_sop_view.dart';
+import '../modules/pelaksanaan_sop/bindings/pelaksanaan_sop_binding.dart';
+import '../modules/pelaksanaan_sop/views/pelaksanaan_sop_view.dart';
 
 part 'app_routes.dart';
 
@@ -76,6 +78,11 @@ class AppPages {
       name: _Paths.TUGAS_SOP,
       page: () => const TugasSopView(),
       binding: TugasSopBinding(),
+    ),
+    GetPage(
+      name: _Paths.PELAKSANAAN_SOP,
+      page: () => const PelaksanaanSopView(),
+      binding: PelaksanaanSopBinding(),
     ),
   ];
 }

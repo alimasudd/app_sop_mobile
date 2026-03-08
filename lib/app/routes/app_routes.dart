@@ -13,6 +13,7 @@ abstract class Routes {
   static const SOP = _Paths.SOP;
   static const LANGKAH_SOP = _Paths.LANGKAH_SOP;
   static const TUGAS_SOP = _Paths.TUGAS_SOP;
+  static const PELAKSANAAN_SOP = _Paths.PELAKSANAAN_SOP;
 }
 
 abstract class _Paths {
@@ -27,4 +28,5 @@ abstract class _Paths {
   static const SOP = '/sop';
   static const LANGKAH_SOP = '/langkah-sop';
   static const TUGAS_SOP = '/tugas-sop';
+  static const PELAKSANAAN_SOP = '/pelaksanaan-sop';
 }

@@ -17,6 +17,8 @@ import 'package:app_sop/app/modules/langkah_sop/views/langkah_sop_view.dart';
 import 'package:app_sop/app/modules/langkah_sop/bindings/langkah_sop_binding.dart';
 import 'package:app_sop/app/modules/tugas_sop/views/tugas_sop_view.dart';
 import 'package:app_sop/app/modules/tugas_sop/bindings/tugas_sop_binding.dart';
+import 'package:app_sop/app/modules/pelaksanaan_sop/views/pelaksanaan_sop_view.dart';
+import 'package:app_sop/app/modules/pelaksanaan_sop/bindings/pelaksanaan_sop_binding.dart';
 
 class HomeView extends GetView<HomeController> {
   const HomeView({Key? key}) : super(key: key);
@@ -46,6 +48,9 @@ class HomeView extends GetView<HomeController> {
     }
     if (!Get.isRegistered<TugasSopBinding>()) {
       TugasSopBinding().dependencies(); 
+    }
+    if (!Get.isRegistered<PelaksanaanSopBinding>()) {
+      PelaksanaanSopBinding().dependencies(); 
     }
 
     return Scaffold(
@@ -274,7 +279,7 @@ class HomeView extends GetView<HomeController> {
       case 13: return const SopView();
       case 14: return const LangkahSopView();
       case 15: return const TugasSopView();
-      case 16: return _buildPlaceholder('Pelaksanaan SOP');
+      case 16: return const PelaksanaanSopView();
       case 20: return _buildPlaceholder('Laporan SOP');
       case 21: return _buildPlaceholder('Laporan Karyawan');
       case 4: return _buildPlaceholder('Pengaturan');

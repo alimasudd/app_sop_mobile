@@ -181,19 +181,19 @@ class AreaView extends GetView<AreaController> {
                   ),
                 ),
                 const Spacer(),
-                _buildActionButton(
+                Obx(() => _buildActionButton(
                   icon: Icons.edit_note,
                   label: 'Edit',
                   color: Colors.orange,
-                  onTap: () => _showAreaForm(area),
-                ),
+                  onTap: controller.isLoading.value || controller.isSaving.value ? null : () => _showAreaForm(area),
+                )),
                 const SizedBox(width: 8),
-                _buildActionButton(
+                Obx(() => _buildActionButton(
                   icon: Icons.delete_outline,
                   label: 'Hapus',
                   color: Colors.red,
-                  onTap: () => controller.deleteArea(area.id!),
-                ),
+                  onTap: controller.isLoading.value || controller.isSaving.value ? null : () => controller.deleteArea(area.id!),
+                )),
               ],
             ),
             const Divider(height: 24),
@@ -216,13 +216,14 @@ class AreaView extends GetView<AreaController> {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required String label, required Color color, required VoidCallback onTap}) {
+  Widget _buildActionButton({required IconData icon, required String label, required Color color, VoidCallback? onTap}) {
+    bool isDisabled = onTap == null;
     return InkWell(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: color,
+          color: isDisabled ? Colors.grey : color,
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
@@ -257,7 +258,7 @@ class AreaView extends GetView<AreaController> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close, size: 20, color: Colors.grey),
-                    onPressed: () => Get.back(),
+                    onPressed: () => Get.back(closeOverlays: true),
                   ),
                 ],
               ),
@@ -298,20 +299,20 @@ class AreaView extends GetView<AreaController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () => Get.back(),
+                    onPressed: () => Get.back(closeOverlays: true),
                     child: const Text('Batal', style: TextStyle(color: Colors.grey)),
                   ),
                   const SizedBox(width: 12),
-                  ElevatedButton(
-                    onPressed: () => controller.saveArea(area?.id),
+                  Obx(() => ElevatedButton(
+                    onPressed: controller.isSaving.value ? null : () => controller.saveArea(area?.id),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1B4EAA),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: Text(area == null ? 'SIMPAN' : 'UPDATE'),
-                  ),
+                    child: Text(controller.isSaving.value ? 'LOADING...' : (area == null ? 'SIMPAN' : 'UPDATE')),
+                  )),
                 ],
               ),
             ],

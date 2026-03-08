@@ -36,12 +36,12 @@ class ConfirmDialog {
         actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         actions: [
           TextButton(
-            onPressed: () => Get.back(),
+            onPressed: () => Get.back(closeOverlays: true),
             child: Text(cancelText, style: const TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             onPressed: () {
-              Get.back();
+              Get.back(closeOverlays: true);
               onConfirm();
             },
             style: ElevatedButton.styleFrom(

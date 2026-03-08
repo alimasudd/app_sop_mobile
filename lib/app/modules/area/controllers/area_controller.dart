@@ -8,6 +8,7 @@ class AreaController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   var areas = <AreaModel>[].obs;
   var isLoading = false.obs;
+  var isSaving = false.obs;
   var perPage = 10.obs;
 
   // Search
@@ -60,7 +61,9 @@ class AreaController extends GetxController {
       return;
     }
 
-    isLoading.value = true;
+    if (isSaving.value) return;
+
+    isSaving.value = true;
     try {
       final areaData = AreaModel(
         nama: namaAreaController.text,
@@ -69,16 +72,12 @@ class AreaController extends GetxController {
 
       if (id == null) {
         await _apiProvider.createArea(areaData);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Area berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.updateArea(id, areaData);
-        FocusManager.instance.primaryFocus?.unfocus();
-        await Future.delayed(const Duration(milliseconds: 100));
-        if (Get.isDialogOpen ?? false) Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Area berhasil diperbarui',
             backgroundColor: Colors.green, colorText: Colors.white);
       }
@@ -88,7 +87,7 @@ class AreaController extends GetxController {
           backgroundColor: Colors.red, colorText: Colors.white);
       debugPrint('Save Area Error: $e');
     } finally {
-      isLoading.value = false;
+      isSaving.value = false;
     }
   }
 
@@ -98,6 +97,7 @@ class AreaController extends GetxController {
       message: 'Apakah Anda yakin ingin menghapus area ini?',
       icon: Icons.delete_sweep,
       onConfirm: () async {
+        if (isLoading.value) return;
         isLoading.value = true;
         try {
           await _apiProvider.deleteArea(id);

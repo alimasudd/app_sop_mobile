@@ -263,7 +263,7 @@ class RuangView extends GetView<RuangController> {
                       room == null ? 'Tambah Ruang' : 'Edit Ruang',
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF343A40)),
                     ),
-                    IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Get.back()),
+                    IconButton(icon: const Icon(Icons.close, size: 20), onPressed: () => Get.back(closeOverlays: true)),
                   ],
                 ),
                 const Divider(),
@@ -316,18 +316,18 @@ class RuangView extends GetView<RuangController> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
+                    TextButton(onPressed: () => Get.back(closeOverlays: true), child: const Text('Batal')),
                     const SizedBox(width: 12),
-                    ElevatedButton(
-                      onPressed: () => controller.saveRoom(room?.id),
+                    Obx(() => ElevatedButton(
+                      onPressed: controller.isSaving.value ? null : () => controller.saveRoom(room?.id),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF1B4EAA),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: Text(room == null ? 'SIMPAN' : 'UPDATE'),
-                    ),
+                      child: Text(controller.isSaving.value ? 'LOADING...' : (room == null ? 'SIMPAN' : 'UPDATE')),
+                    )),
                   ],
                 ),
               ],

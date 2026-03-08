@@ -547,7 +547,7 @@ class LangkahSopView extends GetView<LangkahSopController> {
                       ],
                     ),
                     IconButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () => Get.back(closeOverlays: true),
                       icon: const Icon(Icons.close, size: 20),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -751,7 +751,7 @@ class LangkahSopView extends GetView<LangkahSopController> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () => Get.back(),
+                      onPressed: () => Get.back(closeOverlays: true),
                       child: const Text('Batal', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.bold)),
                     ),
                     const SizedBox(width: 16),

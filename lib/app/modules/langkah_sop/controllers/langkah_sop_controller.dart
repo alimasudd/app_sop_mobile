@@ -171,12 +171,12 @@ class LangkahSopController extends GetxController {
 
       if (langkah != null && langkah.id != null) {
         await _apiProvider.updateLangkahSop(langkah.id!, input);
-        Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Langkah SOP berhasil diubah',
             backgroundColor: Colors.green, colorText: Colors.white);
       } else {
         await _apiProvider.createLangkahSop(input);
-        Get.back();
+        Get.back(closeOverlays: true);
         Get.snackbar('Sukses', 'Langkah SOP berhasil ditambahkan',
             backgroundColor: Colors.green, colorText: Colors.white);
       }

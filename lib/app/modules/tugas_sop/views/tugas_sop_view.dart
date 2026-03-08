@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/data/models/tugas_sop_model.dart';
 import 'package:app_sop/app/modules/tugas_sop/controllers/tugas_sop_controller.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 import 'package:intl/intl.dart';
 
 class TugasSopView extends GetView<TugasSopController> {
@@ -25,7 +26,13 @@ class TugasSopView extends GetView<TugasSopController> {
               if (controller.tugasSops.isEmpty) {
                 return const Center(child: Text('Data Penugasan SOP tidak ditemukan'));
               }
-              return _buildDataTable();
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: controller.tugasSops.length,
+                itemBuilder: (context, index) {
+                  return _buildTugasCard(controller.tugasSops[index], index + 1);
+                },
+              );
             }),
           ),
         ],
@@ -33,6 +40,273 @@ class TugasSopView extends GetView<TugasSopController> {
     );
   }
 
+  // ... (Header, InfoBox, Toolbar stay similar with previous layout fixes)
+
+  Widget _buildTugasCard(TugasSopModel item, int no) {
+    String kode = item.sop?['kode'] ?? '-';
+    String namaSop = item.sop?['nama'] ?? '-';
+    String kategoriName = item.sop?['kategori']?['nama'] ?? '-';
+    bool isSemua = item.langkah == null;
+    String langkahText = isSemua ? 'Semua Langkah' : 'Langkah #${item.langkah?['urutan'] ?? '?'}';
+    String langkahSubtext = isSemua ? '' : (item.langkah?['deskripsi_langkah'] ?? '');
+    String userNama = item.user?['nama'] ?? '-';
+    String userHp = item.user?['hp'] ?? '-';
+
+    String tanggal = '-';
+    if (item.createdAt != null) {
+      try {
+        DateTime dt = DateTime.parse(item.createdAt!);
+        tanggal = DateFormat('dd/MM/yyyy HH:mm').format(dt);
+      } catch (e) {
+        tanggal = item.createdAt!;
+      }
+    }
+
+    return Card(
+      color: Colors.white,
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: const BorderSide(color: Color(0xFFEEEEEE)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.withAlpha(25),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text('No: $no', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF1B4EAA))),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(color: const Color(0xFF00C7E6), borderRadius: BorderRadius.circular(4)),
+                  child: Text(kategoriName.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => controller.deleteTugas(item.id!),
+                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                  tooltip: 'Hapus Penugasan',
+                ),
+              ],
+            ),
+            const Divider(height: 24),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('SOP', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(kode, style: const TextStyle(color: Colors.pink, fontSize: 11, fontWeight: FontWeight.bold)),
+                      Text(namaSop, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF343A40))),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('DITUGASKAN KEPADA', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          const Icon(Icons.person, size: 14, color: Colors.blue),
+                          const SizedBox(width: 4),
+                          Expanded(child: Text(userNama, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14))),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.phone_android, size: 14, color: Colors.green),
+                          const SizedBox(width: 4),
+                          Text(userHp, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('CAKUPAN LANGKAH', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: isSemua ? const Color(0xFF10B981) : const Color(0xFF3B82F6),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(langkahText, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      ),
+                      if (!isSemua && langkahSubtext.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(langkahSubtext, style: const TextStyle(fontSize: 11, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('WAKTU PENUGASAN', style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text(tanggal, style: const TextStyle(fontSize: 13, color: Color(0xFF343A40))),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showFormDialog() {
+    Get.dialog(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          width: 500, // Fixed width to prevent jumping and squeezes
+          constraints: BoxConstraints(maxHeight: Get.height * 0.9),
+          padding: const EdgeInsets.all(24),
+          child: Obx(() => SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Icon(controller.isMassal.value ? Icons.people : Icons.add_circle, color: const Color(0xFF343A40)),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              controller.isMassal.value ? 'Penugasan SOP Massal' : 'Tambah Penugasan SOP',
+                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close), padding: EdgeInsets.zero, constraints: const BoxConstraints()),
+                  ],
+                ),
+                const Divider(height: 32),
+                
+                // VERTICAL LAYOUT for Inputs to prevent squeezing
+                _label('Pilih SOP *'),
+                const SizedBox(height: 8),
+                _buildDropdownSearch<int>(
+                  hint: '-- Pilih SOP --',
+                  value: controller.selectedSopId.value,
+                  items: controller.sopList.map((e) => DropdownMenuItem(value: e.id, child: Text('[${e.kode}] ${e.nama}'))).toList(),
+                  onChanged: (val) {
+                    controller.onChangeSop(val);
+                  },
+                ),
+                
+                const SizedBox(height: 20),
+                _label(controller.isMassal.value ? 'Pilih Karyawan * (Bisa Multi-select)' : 'Pilih Karyawan *'),
+                const SizedBox(height: 8),
+                if (!controller.isMassal.value)
+                  _buildDropdownSearch<int>(
+                    hint: '-- Pilih Karyawan --',
+                    value: controller.selectedUserId.value,
+                    items: controller.userList.map((e) => DropdownMenuItem(value: e.id, child: Text('${e.nama} (${e.email})'))).toList(),
+                    onChanged: (val) {
+                      controller.selectedUserId.value = val;
+                    },
+                  )
+                else
+                  _buildMultiSelectUser(),
+
+                const SizedBox(height: 20),
+                _label('Ditugaskan Pada *'),
+                const SizedBox(height: 8),
+                RadioListTile<String>(
+                  title: const Text('Semua Langkah SOP', style: TextStyle(fontSize: 14)),
+                  value: 'semua',
+                  groupValue: controller.ditugaskanPada.value,
+                  onChanged: (val) => controller.ditugaskanPada.value = val!,
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: const Color(0xFF1B4EAA),
+                ),
+                RadioListTile<String>(
+                  title: const Text('Langkah Tertentu', style: TextStyle(fontSize: 14)),
+                  value: 'tertentu',
+                  groupValue: controller.ditugaskanPada.value,
+                  onChanged: (val) => controller.ditugaskanPada.value = val!,
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  activeColor: const Color(0xFF1B4EAA),
+                ),
+
+                if (controller.ditugaskanPada.value == 'tertentu') ...[
+                  const SizedBox(height: 12),
+                  _buildDropdownSearch<int>(
+                    hint: 'Pilih Langkah...',
+                    value: controller.selectedLangkahId.value,
+                    items: controller.langkahSopList.map((e) => DropdownMenuItem(value: e.id, child: Text('Langkah #${e.urutan}: ${e.deskripsiLangkah}'))).toList(),
+                    onChanged: (val) {
+                      controller.selectedLangkahId.value = val;
+                    },
+                  ),
+                ],
+
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => controller.submitAssignment(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: controller.isMassal.value ? const Color(0xFF00C897) : const Color(0xFF1B4EAA),
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    child: Text(
+                      controller.isMassal.value ? 'SIMPAN PENUGASAN MASSAL' : 'SIMPAN PENUGASAN',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )),
+        ),
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  // ... (Header info remains the same)
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -183,298 +457,6 @@ class TugasSopView extends GetView<TugasSopController> {
     );
   }
 
-  Widget _buildDataTable() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
-      ),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: DataTable(
-          headingRowColor: MaterialStateProperty.all(const Color(0xFFF9FAFB)),
-          dataRowMaxHeight: 80,
-          dataRowMinHeight: 70,
-          columnSpacing: 24,
-          columns: const [
-            DataColumn(label: Text('NO', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('NAMA SOP', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('LANGKAH', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('KATEGORI', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('KARYAWAN', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('NO WA', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('TANGGAL TUGAS', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-            DataColumn(label: Text('AKSI', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6B7280)))),
-          ],
-          rows: controller.tugasSops.asMap().entries.map((entry) {
-            int idx = entry.key + 1;
-            TugasSopModel item = entry.value;
-
-            // Parsing Data
-            String kode = item.sop?['kode'] ?? '-';
-            String namaSop = item.sop?['nama'] ?? '-';
-            String kategoriName = item.sop?['kategori']?['nama'] ?? '-';
-
-            // Langkah Badge Config
-            bool isSemua = item.langkah == null;
-            String langkahText = isSemua ? 'Semua Langkah' : 'Langkah #${item.langkah?['urutan_langkah'] ?? '?'}';
-            Color langkahColor = isSemua ? const Color(0xFF10B981) : const Color(0xFF3B82F6);
-            String langkahSubtext = isSemua ? '' : (item.langkah?['deskripsi_langkah'] ?? '');
-
-            // Karyawan
-            String userNama = item.user?['nama'] ?? '-';
-            String userEmail = item.user?['email'] ?? '-';
-            String userHp = item.user?['handphone'] ?? '-';
-            
-            // Tanggal
-            String tanggal = '-';
-            if (item.createdAt != null) {
-              try {
-                DateTime dt = DateTime.parse(item.createdAt!);
-                tanggal = DateFormat('dd/MM/yyyy HH:mm').format(dt);
-              } catch (e) {
-                tanggal = item.createdAt!;
-              }
-            }
-
-            return DataRow(cells: [
-              DataCell(Text('$idx')),
-              DataCell(Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(kode, style: const TextStyle(color: Colors.pink, fontSize: 11, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 4),
-                  Text(namaSop, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF374151))),
-                ],
-              )),
-              DataCell(Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(color: langkahColor, borderRadius: BorderRadius.circular(4)),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (isSemua) const Icon(Icons.list, color: Colors.white, size: 12),
-                        if (!isSemua) const Icon(Icons.check_box, color: Colors.white, size: 12),
-                        const SizedBox(width: 4),
-                        Text(langkahText, style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                  ),
-                  if (!isSemua && langkahSubtext.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: Text(langkahSubtext, style: const TextStyle(fontSize: 11, color: Colors.grey), maxLines: 1),
-                    )
-                ],
-              )),
-              DataCell(Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                decoration: BoxDecoration(color: const Color(0xFF00C7E6), borderRadius: BorderRadius.circular(4)),
-                child: Text(kategoriName.toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-              )),
-              DataCell(Row(
-                children: [
-                  const Icon(Icons.person, color: Color(0xFF3B82F6), size: 16),
-                  const SizedBox(width: 4),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(userNama, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF374151))),
-                      Text(userEmail, style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                    ],
-                  ),
-                ],
-              )),
-              DataCell(Row(
-                children: [
-                  const Icon(Icons.chat_bubble_outline, color: Color(0xFF10B981), size: 14),
-                  const SizedBox(width: 4),
-                  Text(userHp, style: const TextStyle(color: Colors.grey, fontSize: 12)),
-                ],
-              )),
-              DataCell(Text(tanggal, style: const TextStyle(color: Colors.grey, fontSize: 12))),
-              DataCell(ElevatedButton.icon(
-                onPressed: () => controller.deleteTugas(item.id!),
-                icon: const Icon(Icons.delete, size: 14),
-                label: const Text('Hapus', style: TextStyle(fontSize: 12)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                  minimumSize: const Size(0, 0),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                ),
-              )),
-            ]);
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
-  void _showFormDialog() {
-    Get.dialog(
-      Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Container(
-          width: Get.width * 0.7,
-          padding: const EdgeInsets.all(24),
-          child: Obx(() => SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                         Icon(controller.isMassal.value ? Icons.people : Icons.add_circle, color: const Color(0xFF343A40)),
-                         const SizedBox(width: 8),
-                         Text(
-                          controller.isMassal.value ? 'Penugasan SOP Massal' : 'Tambah Penugasan SOP',
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    IconButton(onPressed: () => Get.back(), icon: const Icon(Icons.close)),
-                  ],
-                ),
-                const Divider(),
-                const SizedBox(height: 16),
-                
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _label('Pilih SOP *'),
-                          const SizedBox(height: 8),
-                          _buildDropdownSearch<int>(
-                            hint: '-- Pilih SOP --',
-                            value: controller.selectedSopId.value,
-                            items: controller.sopList.map((e) => DropdownMenuItem(value: e.id, child: Text('[${e.kode}] ${e.nama}'))).toList(),
-                            onChanged: (val) {
-                              controller.onChangeSop(val);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _label(controller.isMassal.value ? 'Pilih Karyawan * (Dapat memilih lebih dari satu)' : 'Pilih Karyawan *'),
-                          const SizedBox(height: 8),
-                          if (!controller.isMassal.value)
-                            _buildDropdownSearch<int>(
-                              hint: '-- Pilih Karyawan --',
-                              value: controller.selectedUserId.value,
-                              items: controller.userList.map((e) => DropdownMenuItem(value: e.id, child: Text('${e.nama} (${e.email})'))).toList(),
-                              onChanged: (val) {
-                                controller.selectedUserId.value = val;
-                              },
-                            )
-                          else
-                            _buildMultiSelectUser(),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 24),
-                _label('Ditugaskan Pada *'),
-                const SizedBox(height: 8),
-                RadioListTile<String>(
-                  title: const Text('Semua Langkah — Karyawan bertanggung jawab untuk seluruh langkah di SOP ini', style: TextStyle(fontSize: 13, color: Color(0xFF374151))),
-                  value: 'semua',
-                  groupValue: controller.ditugaskanPada.value,
-                  onChanged: (val) => controller.ditugaskanPada.value = val!,
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  activeColor: const Color(0xFF2575FC),
-                ),
-                RadioListTile<String>(
-                  title: const Text('Langkah Tertentu — Pilih langkah spesifik yang ditugaskan', style: TextStyle(fontSize: 13, color: Color(0xFF374151))),
-                  value: 'tertentu',
-                  groupValue: controller.ditugaskanPada.value,
-                  onChanged: (val) => controller.ditugaskanPada.value = val!,
-                  dense: true,
-                  contentPadding: EdgeInsets.zero,
-                  activeColor: const Color(0xFF2575FC),
-                ),
-
-                if (controller.ditugaskanPada.value == 'tertentu') ...[
-                  const SizedBox(height: 16),
-                  _label('Pilih Langkah'),
-                  const SizedBox(height: 8),
-                  _buildDropdownSearch<int>(
-                    hint: 'Pilih Langkah...',
-                    value: controller.selectedLangkahId.value,
-                    items: controller.langkahSopList.map((e) => DropdownMenuItem(value: e.id, child: Text('Langkah #${e.urutan}: ${e.deskripsiLangkah}'))).toList(),
-                    onChanged: (val) {
-                      controller.selectedLangkahId.value = val;
-                    },
-                  ),
-                ],
-
-                if (controller.isMassal.value) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: const Color(0xFF00C7E6), borderRadius: BorderRadius.circular(8)),
-                    child: const Row(
-                      children: [
-                        Icon(Icons.info, color: Colors.white, size: 16),
-                        SizedBox(width: 8),
-                        Text('Karyawan yang sudah ditugaskan pada SOP/langkah ini akan dilewati secara otomatis.', style: TextStyle(color: Colors.white, fontSize: 13)),
-                      ],
-                    ),
-                  )
-                ],
-
-                const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    TextButton(onPressed: () => Get.back(), child: const Text('Batal', style: TextStyle(color: Color(0xFF4B5563)))),
-                    const SizedBox(width: 12),
-                    ElevatedButton.icon(
-                      onPressed: () => controller.submitAssignment(),
-                      icon: const Icon(Icons.save, size: 18),
-                      label: Text(controller.isMassal.value ? 'Simpan Penugasan Massal' : 'SIMPAN'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: controller.isMassal.value ? const Color(0xFF00C897) : const Color(0xFF1B4EAA),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )),
-        ),
-      ),
-      barrierDismissible: false,
-    );
-  }
-
   Widget _buildMultiSelectUser() {
     return Container(
       padding: const EdgeInsets.all(12),
@@ -486,30 +468,30 @@ class TugasSopView extends GetView<TugasSopController> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
+          Obx(() => Wrap(
             spacing: 8,
             runSpacing: 8,
             children: controller.selectedUserIds.map((userId) {
               final user = controller.userList.firstWhereOrNull((u) => u.id == userId);
               if (user == null) return const SizedBox();
               return Chip(
-                label: Text('${user.nama} (${user.email})', style: const TextStyle(fontSize: 12)),
+                label: Text(user.nama ?? '', style: const TextStyle(fontSize: 11)),
                 deleteIcon: const Icon(Icons.close, size: 14),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 onDeleted: () => controller.toggleUserSelection(userId),
                 backgroundColor: const Color(0xFFE5E7EB),
-                padding: const EdgeInsets.all(4),
               );
             }).toList(),
-          ),
+          )),
           const SizedBox(height: 8),
           DropdownButtonHideUnderline(
             child: DropdownButton<int>(
               isExpanded: true,
-              hint: const Text('Tambah Karyawan...'),
+              hint: const Text('Tambah Karyawan...', style: TextStyle(fontSize: 13)),
               value: null,
               items: controller.userList
                 .where((u) => !controller.selectedUserIds.contains(u.id))
-                .map((e) => DropdownMenuItem(value: e.id, child: Text('${e.nama} (${e.email})')))
+                .map((e) => DropdownMenuItem(value: e.id, child: Text('${e.nama} (${e.email})', style: const TextStyle(fontSize: 13))))
                 .toList(),
               onChanged: (val) {
                 if (val != null) controller.toggleUserSelection(val);
@@ -541,7 +523,7 @@ class TugasSopView extends GetView<TugasSopController> {
       child: DropdownButtonHideUnderline(
         child: DropdownButton<T>(
           isExpanded: true,
-          hint: Text(hint),
+          hint: Text(hint, style: const TextStyle(fontSize: 13)),
           value: value,
           items: items,
           onChanged: onChanged,

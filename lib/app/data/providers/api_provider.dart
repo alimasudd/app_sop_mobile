@@ -268,15 +268,19 @@ class ApiProvider {
 
   // Common Error Handler
   void _handleError(http.Response response) {
-    if (response.statusCode == 422) {
+    try {
       final errorData = json.decode(response.body);
-      String message = errorData['message'] ?? 'Validation Error';
-      if (errorData['data'] != null && errorData['data'] is Map) {
-        message = (errorData['data'] as Map).values.first[0];
+      String message = errorData['message'] ?? 'Gagal memproses permintaan';
+      if (errorData['error'] != null) {
+        message = "$message: ${errorData['error']}";
+      } else if (errorData['data'] != null && errorData['data'] is Map) {
+        message = (errorData['data'] as Map).values.first[0].toString();
       }
       throw Exception(message);
+    } catch (e) {
+      if (e is Exception && !e.toString().contains('FormatException')) throw e;
+      throw Exception('Gagal memproses permintaan: ${response.statusCode}');
     }
-    throw Exception('Gagal memproses permintaan: ${response.statusCode}');
   }
 
   // --- KATEGORI SOP API ---

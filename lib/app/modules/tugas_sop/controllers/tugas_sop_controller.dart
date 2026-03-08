@@ -1,5 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:app_sop/app/routes/app_pages.dart';
+import 'package:app_sop/app/data/providers/confirm_dialog.dart';
 import 'package:app_sop/app/data/providers/api_provider.dart';
 import 'package:app_sop/app/data/models/tugas_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
@@ -23,11 +26,11 @@ class TugasSopController extends GetxController {
 
   // Form State
   var isMassal = false.obs;
-  var selectedSopId = RxnInt();
-  var selectedUserId = RxnInt(); // Single
+  var selectedSopId = Rxn<int>();
+  var selectedUserId = Rxn<int>(); // Single
   var selectedUserIds = <int>[].obs; // Massal
   var ditugaskanPada = 'semua'.obs; // 'semua' or 'tertentu'
-  var selectedLangkahId = RxnInt(); // The API allows array for langkah too, but UI shows single select for "Langkah Tertentu". We can send array of 1.
+  var selectedLangkahId = Rxn<int>(); // The API allows array for langkah too, but UI shows single select for "Langkah Tertentu". We can send array of 1.
 
   @override
   void onInit() {
@@ -139,33 +142,38 @@ class TugasSopController extends GetxController {
         payload['sop_langkah_ids'] = [selectedLangkahId.value];
       }
 
+      debugPrint("Sending assignment payload: ${json.encode(payload)}");
       final response = await _apiProvider.createTugasSop(payload);
       Get.back(); // close dialog
       Get.snackbar('Sukses', 'Berhasil menugaskan SOP', backgroundColor: Colors.green, colorText: Colors.white);
       fetchTugasSops();
     } catch (e) {
       Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+      debugPrint(e.toString());
     }
   }
 
   Future<void> deleteTugas(int id) async {
-    Get.defaultDialog(
+    ConfirmDialog.show(
       title: 'Hapus Tugas',
-      middleText: 'Yakin ingin menghapus penugasan ini?',
-      textConfirm: 'Ya, Hapus',
-      textCancel: 'Batal',
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
+      message: 'Apakah Anda yakin ingin menghapus penugasan ini? Tindakan ini tidak dapat dibatalkan.',
+      icon: Icons.delete_forever,
       onConfirm: () async {
-        Get.back(); // close dialog
         try {
           await _apiProvider.deleteTugasSop(id);
-          Get.snackbar('Sukses', 'Data berhasil dihapus');
+          Get.snackbar(
+            'Sukses', 
+            'Penugasan berhasil dihapus',
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
           fetchTugasSops();
         } catch (e) {
-           Get.snackbar('Error', e.toString());
+           Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);
+           debugPrint(e.toString());
         }
-      }
+      },
     );
   }
 }

@@ -412,6 +412,7 @@ class ApiProvider {
     
     final response = await http.get(Uri.parse(url), headers: await _getHeaders());
     if (response.statusCode == 200) {
+      debugPrint('Langkah API Response: ${response.body}');
       final jsonResponse = json.decode(response.body);
       final List data = jsonResponse['data']['langkahs'];
       return data.map((json) => SopLangkahModel.fromJson(json)).toList();

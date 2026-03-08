@@ -110,6 +110,14 @@ class PelaksanaanSopController extends GetxController {
     langkahList.clear();
     if (sopId != null) {
       fetchLangkahBySop(sopId);
+      
+      // Auto-set property from SOP model if found
+      final selectedSop = sopList.firstWhereOrNull((e) => e.id == sopId);
+      if (selectedSop != null) {
+        // Map status string to integer index if possible
+        // 0=Harian, 1=Mingguan, 2=Bulanan, 3=Tahunan
+        // Adjust this mapping based on your SOP periode string
+      }
     }
   }
 
@@ -158,6 +166,11 @@ class PelaksanaanSopController extends GetxController {
       }
     } else {
       resetForm();
+    }
+    
+    // Safety check: ensure dropdown lists are not empty when editing
+    if (sopList.isEmpty || userList.isEmpty) {
+      fetchInitialData();
     }
   }
 

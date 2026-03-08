@@ -406,7 +406,7 @@ class LangkahSopView extends GetView<LangkahSopController> {
                   icon: Icons.delete_outline,
                   color: Colors.red,
                   label: 'Hapus',
-                  onTap: () => _showDeleteDialog(context, item.id!),
+                  onTap: () => controller.deleteLangkah(item.id!),
                 ),
               ],
             ),
@@ -511,25 +511,6 @@ class LangkahSopView extends GetView<LangkahSopController> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, int id) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hapus Langkah'),
-        content: const Text('Apakah Anda yakin ingin menghapus langkah SOP ini?'),
-        actions: [
-          TextButton(onPressed: () => Get.back(), child: const Text('Batal')),
-          TextButton(
-            onPressed: () {
-              Get.back();
-              controller.deleteLangkah(id);
-            },
-            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showFormDialog(BuildContext context, {var langkah}) {
     controller.openFormDialog(langkah: langkah);
@@ -703,45 +684,24 @@ class LangkahSopView extends GetView<LangkahSopController> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Row(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _label('Deadline Waktu'),
-                                const SizedBox(height: 8),
-                                _textField(controller.deadlineController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _label('Toleransi Sebelum'),
-                                const SizedBox(height: 8),
-                                _textField(controller.toleransiSebelumController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
-                                const SizedBox(height: 4),
-                                const Text('Batas waktu mulai sebelum deadline', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _label('Toleransi Sesudah'),
-                                const SizedBox(height: 8),
-                                _textField(controller.toleransiSesudahController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
-                                const SizedBox(height: 4),
-                                const Text('Batas waktu selesai sesudah deadline', style: TextStyle(fontSize: 10, color: Colors.grey)),
-                              ],
-                            ),
-                          ),
+                          _label('Deadline Waktu'),
+                          const SizedBox(height: 8),
+                          _textField(controller.deadlineController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
+                          const SizedBox(height: 16),
+                          _label('Toleransi Sebelum'),
+                          const SizedBox(height: 8),
+                          _textField(controller.toleransiSebelumController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
+                          const SizedBox(height: 4),
+                          const Text('Batas waktu mulai sebelum deadline', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                          const SizedBox(height: 16),
+                          _label('Toleransi Sesudah'),
+                          const SizedBox(height: 8),
+                          _textField(controller.toleransiSesudahController, 'dd/mm/yyyy --:--', icon: Icons.calendar_today),
+                          const SizedBox(height: 4),
+                          const Text('Batas waktu selesai sesudah deadline', style: TextStyle(fontSize: 10, color: Colors.grey)),
                         ],
                       ),
                       

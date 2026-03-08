@@ -7,6 +7,7 @@ import 'package:app_sop/app/data/models/area_model.dart';
 import 'package:app_sop/app/data/models/ruang_model.dart';
 import 'package:app_sop/app/data/models/kategori_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_model.dart';
+import 'package:app_sop/app/data/models/sop_langkah_model.dart';
 
 class ApiProvider {
   // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
@@ -159,8 +160,8 @@ class ApiProvider {
   }
 
   // --- AREA API ---
-  Future<List<AreaModel>> getAreas({String? search}) async {
-    String url = '$baseUrl/areas?per_page=100';
+  Future<List<AreaModel>> getAreas({String? search, int perPage = 10}) async {
+    String url = '$baseUrl/areas?per_page=$perPage';
     if (search != null && search.isNotEmpty) url += '&search=$search';
 
     final response = await http.get(Uri.parse(url), headers: await _getHeaders());
@@ -212,8 +213,8 @@ class ApiProvider {
   }
 
   // --- RUANG API ---
-  Future<List<RuangModel>> getRuangs({String? search}) async {
-    String url = '$baseUrl/ruangs?per_page=100';
+  Future<List<RuangModel>> getRuangs({String? search, int perPage = 10}) async {
+    String url = '$baseUrl/ruangs?per_page=$perPage';
     if (search != null && search.isNotEmpty) url += '&search=$search';
 
     final response = await http.get(Uri.parse(url), headers: await _getHeaders());
@@ -278,8 +279,8 @@ class ApiProvider {
   }
 
   // --- KATEGORI SOP API ---
-  Future<List<KategoriSopModel>> getKategoriSops({String? search}) async {
-    String url = '$baseUrl/kategori-sops?per_page=100';
+  Future<List<KategoriSopModel>> getKategoriSops({String? search, int perPage = 10}) async {
+    String url = '$baseUrl/kategori-sops?per_page=$perPage';
     if (search != null && search.isNotEmpty) url += '&search=$search';
 
     final response = await http.get(Uri.parse(url), headers: await _getHeaders());
@@ -342,8 +343,8 @@ class ApiProvider {
   }
 
   // --- SOP API ---
-  Future<List<SopModel>> getSops({String? search}) async {
-    String url = '$baseUrl/sops?per_page=100';
+  Future<List<SopModel>> getSops({String? search, int perPage = 10}) async {
+    String url = '$baseUrl/sops?per_page=$perPage';
     if (search != null && search.isNotEmpty) url += '&search=$search';
 
     final response = await http.get(Uri.parse(url), headers: await _getHeaders());
@@ -392,6 +393,52 @@ class ApiProvider {
   Future<void> deleteSop(int id) async {
     final response = await http.delete(Uri.parse('$baseUrl/sops/$id'), headers: await _getHeaders());
     if (response.statusCode != 200) throw Exception('Gagal menghapus SOP');
+  }
+
+  // ===============================
+  // LANGKAH SOP API
+  // ===============================
+
+  Future<List<SopLangkahModel>> getLangkahSops({String? search, int? sopId, int perPage = 10}) async {
+    String url = '$baseUrl/langkah-sops?per_page=$perPage&';
+    if (search != null && search.isNotEmpty) url += 'search=$search&';
+    if (sopId != null) url += 'sop_id=$sopId&';
+    
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      final List data = jsonResponse['data']['langkahs'];
+      return data.map((json) => SopLangkahModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Gagal memuat langkah SOP');
+    }
+  }
+
+  Future<void> createLangkahSop(SopLangkahModel langkah) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/langkah-sops'),
+      headers: await _getHeaders(),
+      body: json.encode(langkah.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updateLangkahSop(int id, SopLangkahModel langkah) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/langkah-sops/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(langkah.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deleteLangkahSop(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/langkah-sops/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus langkah SOP');
   }
 }
 

@@ -564,5 +564,41 @@ class ApiProvider {
     }
     throw Exception('Gagal memuat dashboard karyawan');
   }
+
+  Future<Map<String, dynamic>> getTugasKaryawan() async {
+    final response = await http.get(
+      Uri.parse('$baseUrl/karyawan/tugas'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      return decoded['data'] ?? {};
+    }
+    throw Exception('Gagal memuat tugas karyawan');
+  }
+
+  Future<void> mulaiTugasKaryawan(int langkahId) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/karyawan/tugas/$langkahId/mulai'),
+      headers: await _getHeaders(),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> selesaiTugasKaryawan(int langkahId, {String? des, String? url}) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/karyawan/tugas/$langkahId/selesai'),
+      headers: await _getHeaders(),
+      body: json.encode({
+        if (des != null) 'des': des,
+        if (url != null) 'url': url,
+      }),
+    );
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      _handleError(response);
+    }
+  }
 }
 

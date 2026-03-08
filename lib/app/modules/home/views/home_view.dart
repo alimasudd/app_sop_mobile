@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/modules/home/bindings/home_binding.dart';
 import 'package:app_sop/app/modules/home/views/dashboard_view.dart';
+import 'package:app_sop/app/modules/home/views/dashboard_karyawan_view.dart';
 import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
 import 'package:app_sop/app/modules/users/views/users_view.dart';
 import 'package:app_sop/app/modules/users/bindings/users_binding.dart';
@@ -269,7 +270,7 @@ class HomeView extends GetView<HomeController> {
 
   Widget _buildBody(int index) {
     switch (index) {
-      case 0: return const DashboardView();
+      case 0: return controller.isAdmin.value ? const DashboardView() : const DashboardKaryawanView();
       case 1: return const UsersView();
       case 101: return const AreaView();
       case 11: return const RuangView();
@@ -295,7 +296,7 @@ class HomeView extends GetView<HomeController> {
       case 54: return _buildPlaceholder('Cleaning Service Users');
       case 55: return _buildPlaceholder('Staf Toko Users');
       case 56: return _buildPlaceholder('Staf HRD Users');
-      default: return const DashboardView();
+      default: return controller.isAdmin.value ? const DashboardView() : const DashboardKaryawanView();
     }
   }
 

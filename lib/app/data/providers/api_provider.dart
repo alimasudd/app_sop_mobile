@@ -6,6 +6,7 @@ import 'package:app_sop/app/data/models/user_model.dart';
 import 'package:app_sop/app/data/models/area_model.dart';
 import 'package:app_sop/app/data/models/ruang_model.dart';
 import 'package:app_sop/app/data/models/kategori_sop_model.dart';
+import 'package:app_sop/app/data/models/sop_model.dart';
 
 class ApiProvider {
   // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
@@ -339,4 +340,58 @@ class ApiProvider {
     }
     throw Exception('Gagal memuat list SOP');
   }
+
+  // --- SOP API ---
+  Future<List<SopModel>> getSops({String? search}) async {
+    String url = '$baseUrl/sops?per_page=100';
+    if (search != null && search.isNotEmpty) url += '&search=$search';
+
+    final response = await http.get(Uri.parse(url), headers: await _getHeaders());
+    if (response.statusCode == 200) {
+      final decoded = json.decode(response.body);
+      List dataList = [];
+      if (decoded['data'] != null) {
+        var data = decoded['data'];
+        if (data is Map) {
+          if (data['sops'] != null) {
+            dataList = data['sops'];
+          } else if (data['items'] != null) {
+            dataList = data['items'];
+          }
+        } else if (data is List) {
+          dataList = data;
+        }
+      }
+      return dataList.map((e) => SopModel.fromJson(e)).toList();
+    }
+    throw Exception('Gagal memuat SOP');
+  }
+
+  Future<void> createSop(SopModel sop) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/sops'),
+      headers: await _getHeaders(),
+      body: json.encode(sop.toJson()),
+    );
+    if (response.statusCode != 201 && response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> updateSop(int id, SopModel sop) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/sops/$id'),
+      headers: await _getHeaders(),
+      body: json.encode(sop.toJson()),
+    );
+    if (response.statusCode != 200) {
+      _handleError(response);
+    }
+  }
+
+  Future<void> deleteSop(int id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/sops/$id'), headers: await _getHeaders());
+    if (response.statusCode != 200) throw Exception('Gagal menghapus SOP');
+  }
 }
+

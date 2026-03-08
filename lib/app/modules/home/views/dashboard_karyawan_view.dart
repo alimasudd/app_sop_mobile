@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:app_sop/app/modules/home/controllers/dashboard_karyawan_controller.dart';
+import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
 
 class DashboardKaryawanView extends StatelessWidget {
   const DashboardKaryawanView({Key? key}) : super(key: key);
@@ -208,10 +209,12 @@ class DashboardKaryawanView extends StatelessWidget {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: [
-          _buildStatCard(
-            title: 'Total Langkah',
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildStatCard(
+              title: 'Total Langkah',
             value: '${summary['total_langkah'] ?? 0}',
             icon: Icons.list_alt,
             color: const Color(0xFF6366F1), // Indigo/Purple
@@ -246,12 +249,13 @@ class DashboardKaryawanView extends StatelessWidget {
           ),
         ],
       ),
+      ),
     );
   }
 
   Widget _buildStatCard({required String title, required String value, required IconData icon, required Color color}) {
     return Container(
-      width: 140,
+      constraints: const BoxConstraints(minWidth: 140),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: color,
@@ -266,6 +270,7 @@ class DashboardKaryawanView extends StatelessWidget {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -321,6 +326,9 @@ class DashboardKaryawanView extends StatelessWidget {
                 TextButton(
                   onPressed: () {
                     // Navigate to Tugas menu view
+                    if (Get.isRegistered<HomeController>()) {
+                      Get.find<HomeController>().changeIndex(5);
+                    }
                   },
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
@@ -444,7 +452,11 @@ class DashboardKaryawanView extends StatelessWidget {
               iconColor: const Color(0xFF4A65E6),
               title: 'Kerjakan Tugas',
               subtitle: 'Buka tugas hari ini',
-              onTap: () {}, // Handle navigation to My Tasks
+              onTap: () {
+                if (Get.isRegistered<HomeController>()) {
+                  Get.find<HomeController>().changeIndex(5);
+                }
+              },
             ),
             const SizedBox(height: 12),
             _buildActionItem(

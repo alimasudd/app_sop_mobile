@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:app_sop/app/modules/home/bindings/home_binding.dart';
 import 'package:app_sop/app/modules/home/views/dashboard_view.dart';
 import 'package:app_sop/app/modules/home/views/dashboard_karyawan_view.dart';
+import 'package:app_sop/app/modules/home/views/tugas_saya_view.dart';
 import 'package:app_sop/app/modules/home/controllers/home_controller.dart';
 import 'package:app_sop/app/modules/users/views/users_view.dart';
 import 'package:app_sop/app/modules/users/bindings/users_binding.dart';
@@ -285,7 +286,7 @@ class HomeView extends GetView<HomeController> {
       case 21: return _buildPlaceholder('Laporan Karyawan');
       case 4: return _buildPlaceholder('Pengaturan');
       // Karyawan Menus
-      case 5: return _buildPlaceholder('Tugas Saya');
+      case 5: return const TugasSayaView();
       case 6: return _buildPlaceholder('Laporan Saya');
       case 7: return _buildPlaceholder('Profil Saya');
       case 8: return _buildPlaceholder('Ganti Password');

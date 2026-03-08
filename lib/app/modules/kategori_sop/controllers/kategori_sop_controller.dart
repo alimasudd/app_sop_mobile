@@ -8,6 +8,7 @@ class KategoriSopController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   var kategoriSops = <KategoriSopModel>[].obs;
   var isLoading = false.obs;
+  var perPage = 10.obs;
 
   // Search
   final searchController = TextEditingController();
@@ -32,7 +33,7 @@ class KategoriSopController extends GetxController {
   Future<void> fetchKategoriSops({String? query}) async {
     isLoading.value = true;
     try {
-      final data = await _apiProvider.getKategoriSops(search: query);
+      final data = await _apiProvider.getKategoriSops(search: query, perPage: perPage.value);
       kategoriSops.assignAll(data);
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat kategori SOP: $e',

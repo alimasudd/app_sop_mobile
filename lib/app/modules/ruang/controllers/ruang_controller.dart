@@ -9,6 +9,7 @@ class RuangController extends GetxController {
   var rooms = <RuangModel>[].obs;
   var areas = <AreaModel>[].obs;
   var isLoading = false.obs;
+  var perPage = 10.obs;
 
   // Search
   final searchController = TextEditingController();
@@ -27,10 +28,10 @@ class RuangController extends GetxController {
   Future<void> fetchInitialData() async {
     isLoading.value = true;
     try {
-      final areaData = await _apiProvider.getAreas();
+      final areaData = await _apiProvider.getAreas(perPage: 100);
       areas.assignAll(areaData);
       
-      final roomData = await _apiProvider.getRuangs();
+      final roomData = await _apiProvider.getRuangs(perPage: perPage.value);
       rooms.assignAll(roomData);
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat data: $e',
@@ -44,7 +45,7 @@ class RuangController extends GetxController {
   Future<void> fetchRooms({String? query}) async {
     isLoading.value = true;
     try {
-      final data = await _apiProvider.getRuangs(search: query);
+      final data = await _apiProvider.getRuangs(search: query, perPage: perPage.value);
       rooms.assignAll(data);
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat ruang: $e',

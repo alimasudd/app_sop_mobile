@@ -12,6 +12,7 @@ class SopController extends GetxController {
   
   var isLoading = true.obs;
   var isSaving = false.obs;
+  var perPage = 10.obs;
 
   final searchController = TextEditingController();
 
@@ -36,7 +37,7 @@ class SopController extends GetxController {
 
   void fetchKategori() async {
     try {
-      final data = await _apiProvider.getKategoriSops();
+      final data = await _apiProvider.getKategoriSops(perPage: 100);
       kategoriList.assignAll(data);
     } catch (e) {
       debugPrint('Fetch Kategori Error: $e');
@@ -46,7 +47,7 @@ class SopController extends GetxController {
   void fetchSops() async {
     try {
       isLoading(true);
-      final data = await _apiProvider.getSops(search: searchController.text);
+      final data = await _apiProvider.getSops(search: searchController.text, perPage: perPage.value);
       sops.assignAll(data);
     } catch (e) {
       Get.snackbar('Error', e.toString(), backgroundColor: Colors.red, colorText: Colors.white);

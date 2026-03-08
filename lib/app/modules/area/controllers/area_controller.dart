@@ -7,6 +7,7 @@ class AreaController extends GetxController {
   final ApiProvider _apiProvider = ApiProvider();
   var areas = <AreaModel>[].obs;
   var isLoading = false.obs;
+  var perPage = 10.obs;
 
   // Search
   final searchController = TextEditingController();
@@ -24,7 +25,7 @@ class AreaController extends GetxController {
   Future<void> fetchAreas({String? query}) async {
     isLoading.value = true;
     try {
-      final data = await _apiProvider.getAreas(search: query);
+      final data = await _apiProvider.getAreas(search: query, perPage: perPage.value);
       areas.assignAll(data);
     } catch (e) {
       Get.snackbar('Error', 'Gagal memuat area: $e',

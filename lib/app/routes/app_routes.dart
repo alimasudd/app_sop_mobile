@@ -10,6 +10,7 @@ abstract class Routes {
   static const AREA = _Paths.AREA;
   static const RUANG = _Paths.RUANG;
   static const KATEGORI_SOP = _Paths.KATEGORI_SOP;
+  static const SOP = _Paths.SOP;
 }
 
 abstract class _Paths {
@@ -21,4 +22,5 @@ abstract class _Paths {
   static const AREA = '/area';
   static const RUANG = '/ruang';
   static const KATEGORI_SOP = '/kategori-sop';
+  static const SOP = '/sop';
 }

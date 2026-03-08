@@ -12,6 +12,9 @@ import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
 import '../modules/kategori_sop/bindings/kategori_sop_binding.dart';
 import '../modules/kategori_sop/views/kategori_sop_view.dart';
+import '../modules/sop/bindings/sop_binding.dart';
+import '../modules/sop/views/sop_view.dart';
+
 
 part 'app_routes.dart';
 
@@ -55,6 +58,11 @@ class AppPages {
       name: _Paths.KATEGORI_SOP,
       page: () => const KategoriSopView(),
       binding: KategoriSopBinding(),
+    ),
+    GetPage(
+      name: _Paths.SOP,
+      page: () => const SopView(),
+      binding: SopBinding(),
     ),
   ];
 }

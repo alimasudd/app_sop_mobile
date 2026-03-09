@@ -12,8 +12,8 @@ import 'package:app_sop/app/data/models/tugas_sop_model.dart';
 import 'package:app_sop/app/data/models/sop_pelaksanaan_model.dart';
 
 class ApiProvider {
-  // final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
-  final String baseUrl = "http://192.168.1.5:80/api";
+  final String baseUrl = "https://cekdemo.com/ap/apisop/public/api";
+  // final String baseUrl = "http://192.168.1.5:80/api";
 
   // Health Check
   Future<http.Response> checkHealth() async {
@@ -73,7 +73,7 @@ class ApiProvider {
 
   // Get Users with search support
   Future<List<UserModel>> getUsers({String? search}) async {
-    String url = '$baseUrl/users?per_page=100'; // Request more data
+    String url = '$baseUrl/users?per_page=50'; // Maksimal 50 untuk dropdown
     if (search != null && search.isNotEmpty) {
       url += '&search=$search';
     }

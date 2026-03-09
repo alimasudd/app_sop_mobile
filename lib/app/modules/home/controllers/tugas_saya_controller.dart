@@ -14,6 +14,7 @@ class TugasSayaController extends GetxController {
   // Data from API
   final summaryData = {}.obs;
   final tugasHariIni = [].obs;
+  final jadwalPelaksanaan = [].obs;
 
   @override
   void onInit() {
@@ -33,6 +34,10 @@ class TugasSayaController extends GetxController {
       
       if (data.containsKey('tugas_hari_ini')) {
         tugasHariIni.value = data['tugas_hari_ini'] as List<dynamic>;
+      }
+      
+      if (data.containsKey('jadwal_pelaksanaan')) {
+        jadwalPelaksanaan.value = data['jadwal_pelaksanaan'] as List<dynamic>;
       }
     } catch (e) {
       errorMessage('Gagal memuat tugas: ${e.toString()}');
@@ -78,85 +83,173 @@ class TugasSayaController extends GetxController {
   }
 
   Future<void> selesaikanTugas(int langkahId) async {
-    // Tampilkan popup input catatan & url bukti (opsional) 
     TextEditingController desController = TextEditingController();
     TextEditingController urlController = TextEditingController();
 
     Get.dialog(
-      AlertDialog(
-        title: const Text('Selesaikan Tugas', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
+      Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: Colors.white,
+        child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Apakah Anda yakin ingin menyelesaikan langkah ini? Anda dapat menambahkan catatan opsional dan bukti penyelesaian.'),
-            const SizedBox(height: 16),
-            TextField(
-              controller: desController,
-              decoration: const InputDecoration(
-                labelText: 'Catatan (Opsional)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.note),
+            // Header
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                color: Color(0xFF10B981), // Emerald Green
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(16),
+                  topRight: Radius.circular(16),
+                ),
               ),
-              maxLines: 2,
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      'Selesaikan Langkah',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Get.back(),
+                    child: const Icon(Icons.close, color: Colors.white, size: 20),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: urlController,
-              decoration: const InputDecoration(
-                labelText: 'URL Bukti (Opsional)',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.link),
+            
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Catatan Pelaksanaan',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: desController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Tulis catatan pelaksanaan...',
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'URL Bukti (foto/video)',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: urlController,
+                    decoration: InputDecoration(
+                      hintText: 'https://...',
+                      hintStyle: TextStyle(color: Colors.grey[400], fontSize: 13),
+                      filled: true,
+                      fillColor: Colors.grey[50],
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        Get.back(); // close dialog
+                        
+                        try {
+                          Get.dialog(
+                            const Center(child: CircularProgressIndicator()),
+                            barrierDismissible: false,
+                          );
+                          
+                          await _apiProvider.selesaiTugasKaryawan(
+                            langkahId, 
+                            des: desController.text.isNotEmpty ? desController.text : null,
+                            url: urlController.text.isNotEmpty ? urlController.text : null,
+                          );
+                          
+                          Get.back(); // close loading
+                          Get.snackbar(
+                            'Berhasil', 
+                            'Tugas berhasil diselesaikan!',
+                            backgroundColor: Colors.green,
+                            colorText: Colors.white,
+                            snackPosition: SnackPosition.TOP,
+                          );
+                          
+                          fetchTugasData();
+                        } catch (e) {
+                          Get.back(); // close loading
+                          Get.snackbar(
+                            'Gagal', 
+                            e.toString(),
+                            backgroundColor: Colors.red,
+                            colorText: Colors.white,
+                            snackPosition: SnackPosition.TOP,
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.check, color: Colors.white, size: 18),
+                      label: const Text(
+                        'Selesaikan',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF10B981),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF10B981)),
-            onPressed: () async {
-              Get.back(); // tutup popup konfirmasi
-              
-              try {
-                Get.dialog(
-                  const Center(child: CircularProgressIndicator()),
-                  barrierDismissible: false,
-                );
-                
-                await _apiProvider.selesaiTugasKaryawan(
-                  langkahId, 
-                  des: desController.text.isNotEmpty ? desController.text : null,
-                  url: urlController.text.isNotEmpty ? urlController.text : null,
-                );
-                
-                Get.back(); // close loading
-                Get.snackbar(
-                  'Berhasil', 
-                  'Tugas berhasil diselesaikan!',
-                  backgroundColor: Colors.green,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.TOP,
-                );
-                
-                fetchTugasData();
-              } catch (e) {
-                Get.back(); // close loading
-                Get.snackbar(
-                  'Gagal', 
-                  e.toString(),
-                  backgroundColor: Colors.red,
-                  colorText: Colors.white,
-                  snackPosition: SnackPosition.TOP,
-                );
-              }
-            },
-            child: const Text('Selesai', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      )
+      ),
+      barrierDismissible: true,
     );
   }
 }

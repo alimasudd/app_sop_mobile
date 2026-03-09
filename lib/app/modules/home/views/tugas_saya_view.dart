@@ -54,8 +54,6 @@ class TugasSayaView extends StatelessWidget {
                 _buildHeaderCard(),
                 const SizedBox(height: 16),
                 _buildStatCardsRow(summary),
-                const SizedBox(height: 16),
-                _buildJadwalPelaksanaanBlueCard(summary),
                 const SizedBox(height: 24),
                 _buildTabs(),
                 const SizedBox(height: 16),
@@ -138,6 +136,13 @@ class TugasSayaView extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            _buildStatCard(
+              title: 'Jadwal Pelaksanaan',
+              value: '${summary['jadwal_pelaksanaan'] ?? 0}',
+              icon: Icons.calendar_month,
+              color: const Color(0xFF0ea5e9), // Light blue
+            ),
+            const SizedBox(width: 12),
             _buildStatCard(
               title: 'Total Langkah\nHari Ini',
             value: '${summary['total_langkah'] ?? 0}',
@@ -371,9 +376,21 @@ class TugasSayaView extends StatelessWidget {
       if (controller.selectedTab.value == 0) {
         return _buildTugasList();
       } else {
-        return _buildJadwalEmptyState();
+        return _buildJadwalList();
       }
     });
+  }
+
+  Widget _buildJadwalList() {
+    final controller = Get.find<TugasSayaController>();
+
+    if (controller.jadwalPelaksanaan.isEmpty) {
+      return _buildJadwalEmptyState();
+    }
+
+    return Column(
+      children: controller.jadwalPelaksanaan.map<Widget>((sop) => _buildSopCard(sop)).toList(),
+    );
   }
 
   Widget _buildJadwalEmptyState() {
